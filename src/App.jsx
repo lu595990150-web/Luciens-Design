@@ -145,19 +145,16 @@ function BasicTokenTable({ title, columns, rows, id, kicker, description }) {
 function PaletteScale({ palette, onCopy }) {
   return (
     <article className="palette-card">
-      <div className="palette-header" style={{ background: palette.accent }}>
+      <div className="palette-header palette-header-with-description" style={{ background: palette.accent }}>
         <div>
           <span>{palette.category}</span>
           <h3>{palette.name}</h3>
+          <p className="palette-header-description">{palette.description}</p>
         </div>
         <div className="palette-header-meta">
           <strong>{palette.anchor.token}</strong>
           <small>{palette.anchor.value}</small>
         </div>
-      </div>
-
-      <div className="palette-description">
-        <p>{palette.description}</p>
       </div>
 
       <div className="palette-rows">
@@ -180,6 +177,9 @@ function PaletteScale({ palette, onCopy }) {
 }
 
 function SemanticGroup({ group, onCopy }) {
+  const useDarkPreviewText =
+    group.title === '文本色' && group.items.every((item) => item.value.startsWith('rgba(255,255,255'))
+
   return (
     <section className="semantic-group">
       <div className="semantic-heading">
@@ -197,7 +197,9 @@ function SemanticGroup({ group, onCopy }) {
             aria-label={`Copy ${item.name} ${item.value}`}
           >
             <div
-              className={`semantic-preview${item.invert ? ' semantic-preview-dark' : ''}`}
+              className={`semantic-preview${item.invert ? ' semantic-preview-dark' : ''}${
+                useDarkPreviewText ? ' semantic-preview-light-text' : ''
+              }`}
               style={{ background: item.value }}
             >
               <span>{item.value}</span>
@@ -282,41 +284,39 @@ function ColorSystem({ colorSystem, onCopy }) {
   )
 }
 
+function DarkModeCard({ item, onCopy }) {
+  const previewClassName = `dark-token-preview${item.lightText ? ' dark-token-preview-light' : ''}`
+
+  return (
+    <div className="dark-token-item">
+      <button
+        type="button"
+        className="dark-token-card"
+        onClick={() => onCopy(item.value, `${item.name} copied`)}
+        aria-label={`Copy ${item.name} ${item.value}`}
+      >
+        <div className={previewClassName} style={{ background: item.value }}>
+          <strong>{item.name}</strong>
+          <span>{item.valueLabel || item.value}</span>
+        </div>
+      </button>
+      {item.usage ? <p className="dark-token-usage">{item.usage}</p> : null}
+    </div>
+  )
+}
+
 function DarkModeSystem({ darkModeSystem, onCopy }) {
   return (
     <section className="doc-section dark-mode-section" id="dark-mode">
       <div className="section-heading">
         <span className="section-kicker">Dark Mode</span>
-        <h2>{darkModeSystem.title}</h2>
-        <p>{darkModeSystem.description}</p>
-      </div>
-
-      <div className="dark-mode-note">
-        <div>
-          <h3>深色模式原则</h3>
-          <p>{darkModeSystem.note}</p>
-        </div>
-        <div className="dark-preview-strip">
-          {darkModeSystem.preview.map((item) => (
-            <button
-              key={item.name}
-              type="button"
-              className="dark-preview-card"
-              style={{ background: item.value }}
-              onClick={() => onCopy(item.value, `${item.name} copied`)}
-              aria-label={`Copy ${item.name} ${item.value}`}
-            >
-              <strong>{item.name}</strong>
-              <span>{item.value}</span>
-            </button>
-          ))}
-        </div>
+        <h2>Dark Mode 深色模式</h2>
       </div>
 
       <div className="dark-panel">
         <div className="subsection-heading dark-subsection">
-          <h3>深色中性色</h3>
-          <p>作为深色界面的基础骨架，负责页面背景、层级划分和内容承载。</p>
+          <h3>中性色</h3>
+          <p>{darkModeSystem.neutralDescription}</p>
         </div>
 
         <div className="palette-grid palette-grid-single">
@@ -326,13 +326,82 @@ function DarkModeSystem({ darkModeSystem, onCopy }) {
 
       <div className="dark-panel">
         <div className="subsection-heading dark-subsection">
-          <h3>深色语义色</h3>
-          <p>文本、边框、分割线和填充全部在深色背景下重新定义，不直接复用浅色模式 token。</p>
+          <h3>背景色</h3>
         </div>
 
-        {darkModeSystem.semanticGroups.map((group) => (
-          <SemanticGroup key={group.title} group={group} onCopy={onCopy} />
-        ))}
+        <div className="dark-token-grid">
+          {darkModeSystem.backgroundItems.map((item) => (
+            <DarkModeCard key={item.name} item={item} onCopy={onCopy} />
+          ))}
+        </div>
+      </div>
+
+      <div className="dark-panel">
+        <div className="subsection-heading dark-subsection">
+          <h3>文本色</h3>
+          <p>{darkModeSystem.textDescription}</p>
+        </div>
+
+        <div className="dark-token-grid">
+          {darkModeSystem.textItems.map((item) => (
+            <DarkModeCard key={item.name} item={item} onCopy={onCopy} />
+          ))}
+        </div>
+      </div>
+
+      <div className="dark-panel">
+        <div className="subsection-heading dark-subsection">
+          <h3>边框色</h3>
+        </div>
+
+        <div className="dark-token-grid dark-token-grid-single">
+          {darkModeSystem.borderItems.map((item) => (
+            <DarkModeCard key={item.name} item={item} onCopy={onCopy} />
+          ))}
+        </div>
+      </div>
+
+      <div className="dark-panel">
+        <div className="subsection-heading dark-subsection">
+          <h3>分割线</h3>
+        </div>
+
+        <div className="dark-token-grid dark-token-grid-single">
+          {darkModeSystem.dividerItems.map((item) => (
+            <DarkModeCard key={item.name} item={item} onCopy={onCopy} />
+          ))}
+        </div>
+      </div>
+
+      <div className="dark-panel">
+        <div className="subsection-heading dark-subsection">
+          <h3>填充色</h3>
+        </div>
+
+        <div className="dark-token-grid">
+          {darkModeSystem.fillItems.map((item) => (
+            <DarkModeCard key={item.name} item={item} onCopy={onCopy} />
+          ))}
+        </div>
+      </div>
+
+      <div className="dark-panel">
+        <div className="subsection-heading dark-subsection">
+          <h3>深色模式使用规则</h3>
+          <p>用于帮助设计和开发快速判断在深色背景下该使用哪一种边框、分割线或填充层级。</p>
+        </div>
+
+        <div className="dark-rule-list">
+          {darkModeSystem.usageRules.map((rule) => (
+            <article key={rule.label} className="dark-rule-card">
+              <div className="dark-rule-head">
+                <strong>{rule.label}</strong>
+                <code>{rule.value}</code>
+              </div>
+              <p>{rule.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -415,44 +484,65 @@ function TypographySystem({ typographySystem }) {
         <p>{typographySystem.description}</p>
       </div>
 
-      <div className="typography-panel">
-        <div className="subsection-heading">
-          <h3>字体选择</h3>
-          <p>{typographySystem.fontIntro}</p>
-        </div>
+      <div className="typography-canvas">
+        <div className="typography-panel">
+          <div className="subsection-heading">
+            <h3>字体选择</h3>
+            <p>{typographySystem.fontIntro}</p>
+          </div>
 
-        <div className="font-stack-card">
-          <code>{typographySystem.fontStack}</code>
-        </div>
+          <div className="font-stack-card">
+            <code>{typographySystem.fontStack}</code>
+          </div>
 
-        <FontSelectionTable fontSelection={typographySystem.fontSelection} />
-      </div>
+          <FontSelectionTable fontSelection={typographySystem.fontSelection} />
 
-      <div className="typography-panel">
-        <div className="subsection-heading">
-          <h3>字体</h3>
-          <p>{typographySystem.scaleIntro}</p>
-        </div>
+          <div className="language-panel">
+            <div className="language-heading">
+              <h4>特殊语言</h4>
+              <p>{typographySystem.specialLanguage.description}</p>
+            </div>
 
-        <TypeScaleTable rows={typographySystem.scale} />
-      </div>
-
-      <div className="grid-system-card">
-        <div className="subsection-heading">
-          <h3>网格系统</h3>
-          <p>最小单位 4pt。所有字号与间距建议围绕 4 的倍数扩展，保持界面节奏一致。</p>
-      </div>
-
-        <div className="grid-system-demo">
-          <div className="mini-grid" aria-hidden="true" />
-          <div className="grid-scale-list">
-            {typographySystem.gridUnits.map((group) => (
-              <div key={group.join('-')} className="grid-scale-row">
-                {group.map((unit) => (
-                  <span key={unit}>{unit}</span>
-                ))}
+            <div className="language-examples">
+              <div className="language-row">
+                <span className="language-label">示例文本</span>
+                <p className="language-copy">{typographySystem.specialLanguage.sampleCn}</p>
               </div>
-            ))}
+
+              <div className="language-row">
+                <span className="language-label">翻译文本</span>
+                <p className="language-copy language-copy-ar">{typographySystem.specialLanguage.sampleAr}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="typography-panel">
+          <div className="subsection-heading">
+            <h3>字体</h3>
+            <p>{typographySystem.scaleIntro}</p>
+          </div>
+
+          <TypeScaleTable rows={typographySystem.scale} />
+        </div>
+
+        <div className="grid-system-card">
+          <div className="subsection-heading">
+            <h3>网格系统</h3>
+            <p>最小单位4pt</p>
+          </div>
+
+          <div className="grid-system-demo">
+            <div className="mini-grid" aria-hidden="true" />
+            <div className="grid-scale-list">
+              {typographySystem.gridUnits.map((group) => (
+                <div key={group.join('-')} className="grid-scale-row">
+                  {group.map((unit) => (
+                    <span key={unit}>{unit}</span>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

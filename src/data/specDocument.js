@@ -272,22 +272,15 @@ export const specDocument = {
   },
   darkModeSystem: {
     title: '深色模式规范',
-    description:
-      '这一节依据同一份 Figma 色彩规范页的深色模式区域整理，单独拆出深色中性色、文本色、边框、分割线与填充层级，方便后续组件状态直接引用。',
-    note:
-      '深色模式需要同时考虑内容可读性、层级分离和交互反馈。设计稿中没有简单复用浅色值，而是重新定义了一套深色背景体系，并通过不同透明度的白色来控制文本和填充层级。',
-    preview: [
-      { name: 'Dark Gray-1', value: '#1E1F21' },
-      { name: 'Dark Gray-2', value: '#2E2F30' },
-      { name: 'Dark Gray-3', value: '#484849' },
-      { name: 'Dark Gray-6', value: '#909296' },
-    ],
+    neutralDescription:
+      '中性色主要被大量的应用在界面的文字部分，此外背景、边框、分割线等场景中也非常常见。产品中性色的定义需要考虑深色背景以及浅色背景的差异，同时结合 WCAG 2.0 标准。',
+    textDescription: '用于常见文字颜色，文本色通过运用不同的中性色，来表现层次结构。',
     neutralPalette: {
       category: '中性色',
-      name: 'Dark Neutral / 深色中性色',
+      name: 'Dark 中性色',
       accent: '#2E2F30',
-      anchor: { token: 'Dark Gray-2', value: '#2E2F30' },
-      description: '深色界面的主背景与层级骨架色，适合页面背景、卡片、边框与浮层承载。',
+      anchor: { token: 'Gray-6', value: '#909296' },
+      description: '',
       scale: makeScale([
         { token: 'Dark Gray-1', value: '#1E1F21' },
         { token: 'Dark Gray-2', value: '#2E2F30' },
@@ -304,43 +297,133 @@ export const specDocument = {
         textColor: index <= 5 ? onDark : onLight,
       })),
     },
-    semanticGroups: [
+    backgroundItems: [
       {
-        title: '文本色',
-        description: '深色模式下通过白色透明度控制文字层级，对应 T1 到 T4 的文本语义。',
-        items: [
-          { name: 'dark-color-text-1', value: 'rgba(255,255,255,0.9)', usage: '标题/正文文字，对应 T1。', invert: true },
-          { name: 'dark-color-text-2', value: 'rgba(255,255,255,0.7)', usage: '正文文字，对应 T2。', invert: true },
-          { name: 'dark-color-text-3', value: 'rgba(255,255,255,0.5)', usage: '辅助文字，对应 T3。', invert: true },
-          { name: 'dark-color-text-4', value: 'rgba(255,255,255,0.3)', usage: '占位和禁用文字，对应 T4。', invert: true },
-        ],
+        name: '整体背景色',
+        value: '#1E1F21',
+        usage: '',
       },
       {
-        title: '边框与分割线',
-        description: '边框和分割线通过深灰色变化来实现层级切割，保持低干扰但清晰可辨。',
-        items: [
-          { name: 'border', value: '#2E2F30', usage: 'Input、选择器等可交互组件描边。', invert: true },
-          { name: 'divider', value: '#484849', usage: '模块之间的分割线（深）。', invert: true },
-        ],
+        name: '一级容器背景',
+        value: '#2E2F30',
+        usage: '',
       },
       {
-        title: '填充色',
-        description: '深色模式的填充色通过不同透明度白色叠加在深色背景上，形成 hover、disabled 和特殊态。',
-        items: [
-          { name: 'dark-color-fill-1', value: 'rgba(255,255,255,0.04)', usage: '填充/禁用（浅）。', invert: true },
-          { name: 'dark-color-fill-2', value: 'rgba(255,255,255,0.08)', usage: '常规/一般表面。', invert: true },
-          { name: 'dark-color-fill-3', value: 'rgba(255,255,255,0.12)', usage: '深色/灰底悬浮（深）。', invert: true },
-          { name: 'dark-color-fill-4', value: 'rgba(255,255,255,0.16)', usage: '重/特殊场景。', invert: true },
-        ],
+        name: '二级容器背景',
+        value: '#303133',
+        usage: '',
       },
       {
-        title: '背景色',
-        description: '深色背景层通过多级深灰建立页面深度，不再直接使用纯黑作为唯一背景。',
-        items: [
-          { name: 'Base Background', value: '#1E1F21', usage: '页面根背景。', invert: true },
-          { name: 'Elevated Surface', value: '#2E2F30', usage: '浮层、卡片和控件基础面。', invert: true },
-          { name: 'Section Divider', value: '#484849', usage: '章节层级区隔。', invert: true },
-        ],
+        name: '三级容器背景',
+        value: '#343638',
+        usage: '',
+      },
+      {
+        name: '下拉弹出框、Tooltip 背景颜色',
+        value: '#373739',
+        usage: '',
+      },
+    ],
+    textItems: [
+      {
+        name: 'dark-color-text-1',
+        value: 'rgba(255,255,255,0.9)',
+        valueLabel: 'fade(#FFF, 90%)',
+        usage: '标题/正文文字。对应 T1 文字类型',
+        lightText: true,
+      },
+      {
+        name: 'dark-color-text-2',
+        value: 'rgba(255,255,255,0.7)',
+        valueLabel: 'fade(#FFF, 70%)',
+        usage: '正文文字。对应 T2 文字类型',
+        lightText: true,
+      },
+      {
+        name: 'dark-color-text-3',
+        value: 'rgba(255,255,255,0.5)',
+        valueLabel: 'fade(#FFF, 50%)',
+        usage: '辅助文字。对应 T3 文字类型',
+      },
+      {
+        name: 'dark-color-text-4',
+        value: 'rgba(255,255,255,0.3)',
+        valueLabel: 'fade(#FFF, 30%)',
+        usage: '占位文字、禁用状态文字。对应 T4 文字类型',
+      },
+    ],
+    borderItems: [
+      {
+        name: 'border',
+        value: '#2E2F30',
+        valueLabel: '#2E2F30',
+        usage: '可交互组件的描边色，如 input',
+      },
+    ],
+    dividerItems: [
+      {
+        name: 'divider',
+        value: '#484849',
+        valueLabel: '#484849',
+        usage: '分隔线（深）',
+      },
+    ],
+    fillItems: [
+      {
+        name: 'dark-color-fill-1',
+        value: 'rgba(255,255,255,0.04)',
+        valueLabel: 'fade(#FFF, 4%)',
+        usage: '填充/禁用（浅）',
+      },
+      {
+        name: 'dark-color-fill-2',
+        value: 'rgba(255,255,255,0.08)',
+        valueLabel: 'fade(#FFF, 8%)',
+        usage: '常规/一般',
+      },
+      {
+        name: 'dark-color-fill-3',
+        value: 'rgba(255,255,255,0.12)',
+        valueLabel: 'fade(#FFF, 12%)',
+        usage: '深色/灰底悬浮（深）',
+      },
+      {
+        name: 'dark-color-fill-4',
+        value: 'rgba(255,255,255,0.16)',
+        valueLabel: 'fade(#FFF, 16%)',
+        usage: '重/特殊场景',
+      },
+    ],
+    usageRules: [
+      {
+        label: 'border',
+        value: '#2E2F30',
+        description: '用于深色界面里可交互组件的描边，比如 Input、Select、表单控件边框。',
+      },
+      {
+        label: 'divider',
+        value: '#484849',
+        description: '用于深色背景下的分割线、模块区隔线、列表项之间的结构分隔。',
+      },
+      {
+        label: 'dark-color-fill-1',
+        value: 'rgba(255,255,255,0.04)',
+        description: '用于很轻的填充、禁用态、弱感知背景层。',
+      },
+      {
+        label: 'dark-color-fill-2',
+        value: 'rgba(255,255,255,0.08)',
+        description: '用于常规表面层、轻 hover、普通容器填充。',
+      },
+      {
+        label: 'dark-color-fill-3',
+        value: 'rgba(255,255,255,0.12)',
+        description: '用于更明确的悬浮态、深色底上的高一级表面反馈。',
+      },
+      {
+        label: 'dark-color-fill-4',
+        value: 'rgba(255,255,255,0.16)',
+        description: '用于更重的特殊场景、高强调状态或更强存在感的填充层。',
       },
     ],
   },
@@ -349,7 +432,7 @@ export const specDocument = {
     description:
       '本节依据 Figma 节点 `440:8753` 的字体规范页整理，包含跨平台字体策略、特殊语言处理、字号与行高体系，以及 4pt 网格输出规则。',
     fontIntro:
-      '目前仅使用无衬线系统字体。MacOS 中文使用 PingFang SC，Windows 中文使用阿里巴巴普惠体 3.0，英文与数字优先使用 Ubuntu；若系统未安装，则回退至各端默认兼容字体。',
+      '目前仅使用无衬线、系统自带字体。MacOS 中文使用 PingFang SC，Windows 中文使用阿里巴巴普惠体 3.0，英文、数字与小语种第一字体统一使用 Ubuntu；若系统未安装 Ubuntu，则回退至平台默认兼容字体。',
     fontStack:
       'font-family: "Helvetica", "Arial", "PingFang SC", "Alibaba PuHuiTi 3.0", "阿里巴巴普惠体3.0", "Ubuntu"',
     fontSelection: [
@@ -359,14 +442,14 @@ export const specDocument = {
     ],
     specialLanguage: {
       description:
-        '阿拉伯文语言场景统一使用 Estedad 字体，避免系统默认字体带来的版式不一致问题。',
+        '在所有系统中，阿拉伯文语言场景统一使用 Estedad 字体，避免系统默认字体带来的版式不一致问题。',
       sampleCn:
         '安道教育是一家位于粤港澳大湾区（东莞松山湖）的国家级高新技术企业，也是国内领先的智慧教育设备制造商和解决方案服务商。',
       sampleAr:
         'شركة أنداو للتعليم هي مؤسسة وطنية عالية التقنية تقع في منطقة الخليج الكبرى لمقاطعات قوانغدونغ وهونغ كونغ وماكاو، وهي أيضًا من الشركات الرائدة في تصنيع معدات التعليم الذكي وتقديم حلول الخدمات في الصين.',
     },
     scaleIntro:
-      '行高并非固定等于字号的 1.5 倍。设计稿采用更贴近实际阅读体验的行高策略，让大标题不显得松散，让小字号正文保持足够呼吸空间。',
+      '行高并非固定等于字号的 1.5 倍。设计稿采用更贴近实际阅读体验的行高策略：大字号标题控制垂直松散感，小字号正文保持足够呼吸空间，并兼顾多种字号混排时的信息连贯性。',
     scale: [
       {
         name: 'Display 36',
