@@ -3,6 +3,50 @@ import './App.css'
 import questionFillIcon from './assets/question-fill.svg'
 import { specDocument } from './data/specDocument'
 
+function InputIcon({ kind }) {
+  if (kind === 'search') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+        <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10.5 10.5L13.2 13.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+      </svg>
+    )
+  }
+
+  if (kind === 'clear') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+        <circle cx="8" cy="8" r="6" fill="currentColor" opacity="0.2" />
+        <path d="M5.5 5.5L10.5 10.5M10.5 5.5L5.5 10.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.4" />
+      </svg>
+    )
+  }
+
+  if (kind === 'eye') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+        <path d="M1.5 8C3.1 5.4 5.2 4 8 4s4.9 1.4 6.5 4c-1.6 2.6-3.7 4-6.5 4S3.1 10.6 1.5 8Z" fill="none" stroke="currentColor" strokeWidth="1.3" />
+        <circle cx="8" cy="8" r="1.9" fill="none" stroke="currentColor" strokeWidth="1.3" />
+      </svg>
+    )
+  }
+
+  if (kind === 'calendar') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+        <rect x="2.2" y="3.2" width="11.6" height="10.2" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M2.5 6H13.5M5 2.5V4.5M11 2.5V4.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.3" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+      <path d="M4.5 6.5L8 10l3.5-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
 function Header({ brand }) {
   return (
     <header className="docs-header">
@@ -17,7 +61,7 @@ function Header({ brand }) {
       <nav className="header-nav" aria-label="Primary">
         <a href="#intro">指南</a>
         <a href="#colors">色彩</a>
-        <a href="#components">组件</a>
+        <a href="#inputs">组件</a>
       </nav>
 
       <div className="header-actions">
@@ -550,6 +594,194 @@ function TypographySystem({ typographySystem }) {
   )
 }
 
+function CornerCard({ item, onCopy }) {
+  return (
+    <article className="corner-card">
+      <div className="corner-demo-stage">
+        <div className="corner-demo-block" style={{ borderRadius: `${item.radius}px` }}>
+          <span className="corner-demo-value">{item.degree}</span>
+          {item.radius > 0 ? (
+            <>
+              <span className="corner-anchor corner-anchor-top-left" aria-hidden="true" />
+              <span className="corner-anchor corner-anchor-top-right" aria-hidden="true" />
+              <span className="corner-anchor corner-anchor-bottom-left" aria-hidden="true" />
+              <span className="corner-anchor corner-anchor-bottom-right" aria-hidden="true" />
+            </>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="corner-meta">
+        <button type="button" className="copy-chip" onClick={() => onCopy(item.css, '圆角参数已复制')}>
+          <code>{item.css}</code>
+        </button>
+        <div className="corner-labels">
+          <strong>{item.label}</strong>
+          <span>
+            {item.token}：{item.value}
+          </span>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function CornerSystem({ cornerSystem, onCopy }) {
+  return (
+    <section className="doc-section" id="corners">
+      <div className="section-heading">
+        <span className="section-kicker">Corner Radius</span>
+        <h2>{cornerSystem.title}</h2>
+        <p>{cornerSystem.description}</p>
+      </div>
+
+      <div className="corner-intro-card">
+        <p>{cornerSystem.intro}</p>
+      </div>
+
+      <div className="corner-stack">
+        {cornerSystem.items.map((item) => (
+          <CornerCard key={item.token} item={item} onCopy={onCopy} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function InputControl({ item }) {
+  const isDisabled = item.state === 'disabled'
+  const valueText = item.value || item.placeholder
+  const showPlaceholder = !item.value
+  const controlClassName = [
+    'input-spec-control',
+    `is-${item.state || 'default'}`,
+    item.prefix ? 'has-prefix' : '',
+    item.clearable || item.type === 'password' || item.type === 'date' || item.type === 'select' || item.type === 'search'
+      ? 'has-suffix'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  let suffixKind = null
+  if (item.type === 'password') suffixKind = 'eye'
+  if (item.type === 'date') suffixKind = 'calendar'
+  if (item.type === 'select') suffixKind = 'chevron'
+  if (item.type === 'search') suffixKind = 'search'
+  if (item.clearable) suffixKind = 'clear'
+
+  return (
+    <div className={controlClassName}>
+      {item.prefix ? (
+        <span className="input-spec-icon input-spec-icon-prefix" aria-hidden="true">
+          <InputIcon kind={item.prefix} />
+        </span>
+      ) : null}
+      <span className={`input-spec-value${showPlaceholder ? ' is-placeholder' : ''}${isDisabled ? ' is-disabled-value' : ''}`}>{valueText}</span>
+      {suffixKind ? (
+        <span className="input-spec-icon input-spec-icon-suffix" aria-hidden="true">
+          <InputIcon kind={suffixKind} />
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
+function InteractiveInputControl({ item }) {
+  const [value, setValue] = useState('')
+
+  return (
+    <label className="input-spec-control input-spec-control-real input-spec-control-interactive">
+      <input
+        type="text"
+        value={value}
+        placeholder={item.placeholder}
+        onChange={(event) => setValue(event.target.value)}
+        aria-label={item.label}
+      />
+    </label>
+  )
+}
+
+function FormLabel({ item }) {
+  return (
+    <div className={`input-form-label input-form-label-${item.orientation || 'horizontal'}`}>
+      {item.required ? <span className="input-required">*</span> : null}
+      <span>{item.label}</span>
+    </div>
+  )
+}
+
+function InputShowcaseItem({ item, isForm = false }) {
+  if (isForm) {
+    return (
+      <article className={`input-form-item input-form-item-${item.orientation}`}>
+        <FormLabel item={item} />
+        <InputControl item={{ ...item, state: item.state || 'default' }} />
+        <span className="input-form-caption">{item.caption}</span>
+      </article>
+    )
+  }
+
+  return (
+    <article className="input-demo-item">
+      {item.interactive ? <InteractiveInputControl item={item} /> : <InputControl item={item} />}
+      <span className="input-demo-caption">{item.label}</span>
+      {item.helper ? <p className="input-demo-helper">{item.helper}</p> : null}
+    </article>
+  )
+}
+
+function InputSection({ section }) {
+  const isForm = section.key.includes('form')
+  const isBasic = section.key === 'basic'
+
+  return (
+    <section className="input-spec-block">
+      <div className="input-spec-block-head">
+        <h3>{section.title}</h3>
+        {section.note ? <p className="input-spec-note">{section.note}</p> : null}
+      </div>
+
+      {section.description ? <p className="input-spec-description">{section.description}</p> : null}
+
+      {isBasic ? (
+        <div className="input-basic-demo-panel">
+          <InputShowcaseItem item={section.items[0]} isForm={false} />
+        </div>
+      ) : (
+        <div className={`input-spec-grid${isForm ? ' is-form-grid' : ''}`}>
+          {section.items.map((item) => (
+            <InputShowcaseItem key={`${section.key}-${item.caption || item.label}-${item.type}`} item={item} isForm={isForm} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function InputSystem({ inputSystem }) {
+  return (
+    <section className="doc-section input-system-section" id="inputs">
+      <div className="section-heading">
+        <span className="section-kicker">Input</span>
+        <h2>{inputSystem.title}</h2>
+        <p>{inputSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{inputSystem.intro}</p>
+      </div>
+
+      <div className="input-spec-canvas">
+        {inputSystem.sections.map((section) => (
+          <InputSection key={section.key} section={section} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function ShadowCard({ item, onCopy }) {
   return (
     <article className="shadow-card">
@@ -711,7 +943,9 @@ function App() {
     darkModeSystem,
     typographySystem,
     spacing,
+    cornerSystem,
     shadowSystem,
+    inputSystem,
     components,
   } = specDocument
 
@@ -757,7 +991,9 @@ function App() {
             columns={['Token', 'Value', 'Usage', 'Note']}
             rows={spacing}
           />
+          <CornerSystem cornerSystem={cornerSystem} onCopy={handleCopy} />
           <ShadowSystem shadowSystem={shadowSystem} onCopy={handleCopy} />
+          <InputSystem inputSystem={inputSystem} />
           <Components components={components} />
         </main>
 

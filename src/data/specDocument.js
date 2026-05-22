@@ -29,7 +29,9 @@ export const specDocument = {
     { id: 'dark-mode', label: '深色模式' },
     { id: 'typography', label: '字体规范' },
     { id: 'spacing', label: '间距系统' },
+    { id: 'corners', label: '圆角规范' },
     { id: 'surfaces', label: '投影规范' },
+    { id: 'inputs', label: '输入框规范' },
     { id: 'components', label: '组件示例' },
   ],
   principles: [
@@ -528,6 +530,55 @@ export const specDocument = {
     { name: 'Space / 16', value: '16px', usage: '卡片内容、列表项之间。', note: '基础模块间距' },
     { name: 'Space / 24', value: '24px', usage: '章节内部区块、组件预览与说明之间。', note: '页面级间距' },
   ],
+  cornerSystem: {
+    title: '圆角规范',
+    description:
+      '本节依据 Figma 节点 `457:1306` 的圆角规范页整理。页面按 5 个圆角等级组织基础 token，保证组件、容器和浮层使用同一套圆角语言。',
+    intro:
+      '圆角用于表达组件亲和度和信息层级。建议从 none / small / regular / medium / large 五档中选择，不再为单个组件临时定义独立圆角值。',
+    items: [
+      {
+        token: 'border-radius-none',
+        value: '0px',
+        degree: '0°',
+        label: '圆角-无',
+        css: 'border-radius: 0px;',
+        radius: 0,
+      },
+      {
+        token: 'border-radius-small',
+        value: '4px',
+        degree: '4°',
+        label: '圆角-小',
+        css: 'border-radius: 4px;',
+        radius: 4,
+      },
+      {
+        token: 'border-radius-regular',
+        value: '8px',
+        degree: '8°',
+        label: '圆角-常规',
+        css: 'border-radius: 8px;',
+        radius: 8,
+      },
+      {
+        token: 'border-radius-medium',
+        value: '16px',
+        degree: '16°',
+        label: '圆角-中等',
+        css: 'border-radius: 16px;',
+        radius: 16,
+      },
+      {
+        token: 'border-radius-large',
+        value: '24px',
+        degree: '24°',
+        label: '圆角-较大',
+        css: 'border-radius: 24px;',
+        radius: 24,
+      },
+    ],
+  },
   shadowSystem: {
     title: '投影规范',
     description:
@@ -651,6 +702,74 @@ export const specDocument = {
         usage: '适合 Modal、强打断确认框、全局浮层。',
         shadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
         kind: 'modal',
+      },
+    ],
+  },
+  inputSystem: {
+    title: '输入框规范',
+    description:
+      '本节依据 Figma 节点 `473:1747` 的输入框规范页整理，并参考 Arco Input 文档的分组方式输出到当前规范站中。',
+    intro:
+      '输入框用于文本录入、筛选、检索、密码查看和日期选择等场景。文档按基础状态、带图标、横版表单、竖版表单四组整理，方便设计与开发对齐。',
+    sections: [
+      {
+        key: 'basic',
+        title: '1. 基础用法',
+        description: '通过鼠标或键盘输入内容。',
+        items: [
+          {
+            label: '基础输入框',
+            type: 'text',
+            placeholder: '请输入内容',
+            state: 'default',
+            interactive: true,
+            helper: '默认展示常规状态；鼠标移入触发 Hover，点击后触发聚焦并可输入。',
+          },
+        ],
+      },
+      {
+        key: 'icon',
+        title: '2. 带图标输入框',
+        items: [
+          { label: '默认状态', type: 'text', placeholder: '请输入内容', state: 'default', prefix: 'search' },
+          { label: '输入内容状态', type: 'text', value: '安道教育', state: 'filled', prefix: 'search' },
+          { label: 'Hover 状态', type: 'text', value: '安道教育', state: 'hover', prefix: 'search', clearable: true },
+          { label: '聚焦状态', type: 'text', value: '安道教育', state: 'focus', prefix: 'search', clearable: true },
+          { label: 'disabled input', type: 'text', placeholder: '请输入内容', state: 'disabled', prefix: 'search' },
+          {
+            label: '错误状态',
+            type: 'text',
+            value: '安道教育',
+            state: 'error',
+            prefix: 'search',
+            helper: '你的内容存在错误',
+          },
+        ],
+      },
+      {
+        key: 'form-horizontal',
+        title: '3. 表单输入框 / 横板',
+        items: [
+          { caption: '筛选-强制', type: 'select', orientation: 'horizontal', required: true, label: '安道教育', placeholder: '请选择' },
+          { caption: '筛选-常规', type: 'select', orientation: 'horizontal', label: '安道教育', placeholder: '请选择' },
+          { caption: '输入-常规', type: 'text', orientation: 'horizontal', required: true, label: '安道教育', placeholder: 'Please Enter' },
+          { caption: '日期筛选', type: 'date', orientation: 'horizontal', required: true, label: '安道教育', value: '2020/01/01（Today）' },
+          { caption: '查询', type: 'search', orientation: 'horizontal', label: '安道教育', placeholder: 'Search for' },
+          { caption: '密码型', type: 'password', orientation: 'horizontal', label: '安道教育', placeholder: 'Please Enter' },
+        ],
+      },
+      {
+        key: 'form-vertical',
+        title: '4. 表单输入框 / 竖板',
+        note: '考虑到多语言场景下，优先默认使用竖版表单输入框',
+        items: [
+          { caption: '筛选-强制', type: 'select', orientation: 'vertical', required: true, label: '安道教育', placeholder: '请选择' },
+          { caption: '筛选-常规', type: 'select', orientation: 'vertical', label: '安道教育', placeholder: '请选择' },
+          { caption: '输入-常规', type: 'text', orientation: 'vertical', required: true, label: '安道教育', placeholder: 'Please Enter' },
+          { caption: '日期筛选', type: 'date', orientation: 'vertical', required: true, label: '安道教育', value: '2020/01/01（Today）' },
+          { caption: '查询', type: 'search', orientation: 'vertical', label: '安道教育', placeholder: 'Search for' },
+          { caption: '密码型', type: 'password', orientation: 'vertical', label: '安道教育', placeholder: 'Please Enter' },
+        ],
       },
     ],
   },

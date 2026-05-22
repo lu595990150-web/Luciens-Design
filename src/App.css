@@ -229,8 +229,11 @@ code {
 .subsection-heading,
 .semantic-heading,
 .shadow-spec,
+.corner-meta,
 .component-doc-meta,
 .shadow-intro-card,
+.corner-intro-card,
+.input-spec-intro-card,
 .typography-panel,
 .grid-system-card {
   display: grid;
@@ -276,6 +279,8 @@ code {
 .palette-description p,
 .shadow-description,
 .shadow-spec p,
+.corner-intro-card p,
+.input-spec-intro-card p,
 .semantic-heading p,
 .component-doc-meta p,
 .shadow-intro-card p,
@@ -311,6 +316,12 @@ code {
 .dark-preview-strip {
   display: grid;
   gap: 16px;
+}
+
+.corner-stack {
+  display: grid;
+  gap: 18px;
+  margin-top: 12px;
 }
 
 .summary-grid {
@@ -364,7 +375,11 @@ code {
 .palette-card,
 .dark-mode-note,
 .shadow-intro-card,
+.corner-intro-card,
+.input-spec-intro-card,
+.input-spec-canvas,
 .shadow-card,
+.corner-card,
 .semantic-card,
 .component-doc-card,
 .typography-panel,
@@ -382,6 +397,8 @@ code {
 .color-intro-card,
 .dark-mode-note,
 .shadow-intro-card,
+.corner-intro-card,
+.input-spec-intro-card,
 .typography-panel,
 .grid-system-card {
   padding: 24px;
@@ -962,6 +979,84 @@ code {
   margin-top: 12px;
 }
 
+.corner-card {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.corner-demo-stage {
+  display: grid;
+  place-items: center;
+  padding: 28px 24px;
+}
+
+.corner-demo-block {
+  position: relative;
+  width: min(100%, 575px);
+  min-height: 233px;
+  display: grid;
+  place-items: center;
+  background: #eaedf1;
+  overflow: hidden;
+}
+
+.corner-demo-value {
+  color: #fff;
+  font-size: 48px;
+  line-height: 56px;
+  font-weight: 400;
+}
+
+.corner-anchor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.corner-anchor-top-left {
+  top: 6px;
+  left: 6px;
+}
+
+.corner-anchor-top-right {
+  top: 6px;
+  right: 6px;
+}
+
+.corner-anchor-bottom-left {
+  bottom: 6px;
+  left: 6px;
+}
+
+.corner-anchor-bottom-right {
+  right: 6px;
+  bottom: 6px;
+}
+
+.corner-labels {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.corner-labels strong {
+  color: var(--heading);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.corner-labels span {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 22px;
+}
+
 .shadow-card {
   padding: 24px;
   display: grid;
@@ -1205,6 +1300,225 @@ code {
   padding: 20px;
 }
 
+.input-spec-canvas {
+  padding: 28px;
+  display: grid;
+  gap: 28px;
+  background: #f8fafc;
+}
+
+.input-spec-block {
+  display: grid;
+  gap: 18px;
+}
+
+.input-spec-description {
+  margin: -6px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.input-spec-block-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.input-spec-block-head h3 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 600;
+}
+
+.input-spec-note {
+  margin: 0;
+  color: #ee493f;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.input-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px 22px;
+}
+
+.input-basic-demo-panel {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 420px);
+  gap: 20px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.input-spec-grid.is-form-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.input-demo-item,
+.input-form-item {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.input-basic-demo-panel .input-demo-item {
+  gap: 10px;
+}
+
+.input-demo-caption,
+.input-form-caption {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.input-demo-helper {
+  margin: 0;
+  color: #ee493f;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.input-form-item-vertical {
+  gap: 6px;
+}
+
+.input-form-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--heading);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.input-form-label-vertical {
+  margin-bottom: 2px;
+}
+
+.input-required {
+  color: #f2515b;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.input-spec-control {
+  min-height: 36px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cfd3d7;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.input-spec-control.has-prefix {
+  padding-left: 12px;
+}
+
+.input-spec-control.has-suffix {
+  padding-right: 10px;
+}
+
+.input-spec-control.is-default {
+  border-color: #f5f6f8;
+}
+
+.input-spec-control.is-filled {
+  border-color: #f5f6f8;
+}
+
+.input-spec-control.is-hover {
+  border-color: var(--accent);
+}
+
+.input-spec-control.is-focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(33, 118, 246, 0.2);
+}
+
+.input-spec-control-real {
+  padding: 0;
+  overflow: hidden;
+}
+
+.input-spec-control-interactive:hover {
+  border-color: var(--accent);
+}
+
+.input-spec-control-interactive:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(33, 118, 246, 0.2);
+}
+
+.input-spec-control-real input {
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: none;
+  outline: none;
+  background: #fff;
+  color: #373944;
+  font-size: 14px;
+  line-height: 22px;
+  font-family: inherit;
+}
+
+.input-spec-control-real input::placeholder {
+  color: #aaafbc;
+}
+
+.input-spec-control.is-error {
+  border-color: #ee493f;
+}
+
+.input-spec-control.is-disabled {
+  border-color: #eaedf1;
+  background: #f5f6f8;
+}
+
+.input-spec-value {
+  min-width: 0;
+  flex: 1 1 auto;
+  color: #373944;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input-spec-value.is-placeholder {
+  color: #aaafbc;
+}
+
+.input-spec-value.is-disabled-value {
+  color: #d9dde4;
+}
+
+.input-spec-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #88909b;
+}
+
+.input-icon-svg {
+  width: 16px;
+  height: 16px;
+}
+
 .preview-button {
   padding: 12px 18px;
   border: 1px solid transparent;
@@ -1284,7 +1598,10 @@ code {
   .principle-list,
   .palette-grid,
   .semantic-grid,
+  .corner-stack,
   .shadow-grid,
+  .input-spec-grid,
+  .input-basic-demo-panel,
   .component-doc-grid,
   .dark-preview-strip {
     grid-template-columns: 1fr;
