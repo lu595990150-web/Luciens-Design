@@ -1,0 +1,52 @@
+:root {
+  --bg: #ffffff;
+  --text: #4e5969;
+  --heading: #1d2129;
+  --muted: #86909c;
+  --line: #e5e6eb;
+  --accent: #165dff;
+  font-family:
+    "Alibaba PuHuiTi 3.0",
+    "Alibaba PuHuiTi 3.0 55 Regular",
+    "Alibaba PuHuiTi 3.0 45 Light",
+    "Alibaba PuHuiTi 3.0 75 SemiBold",
+    "阿里巴巴普惠体 3.0",
+    "PingFang SC",
+    "Noto Sans SC",
+    "Microsoft YaHei",
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
