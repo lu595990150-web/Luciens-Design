@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import './App.css'
 import questionFillIcon from './assets/question-fill.svg'
 import { specDocument } from './data/specDocument'
@@ -652,23 +652,15 @@ function InputControl({ item }) {
   const isDisabled = item.state === 'disabled'
   const valueText = item.value || item.placeholder
   const showPlaceholder = !item.value
+  const suffixKind = getInputSuffixKind(item)
   const controlClassName = [
     'input-spec-control',
     `is-${item.state || 'default'}`,
     item.prefix ? 'has-prefix' : '',
-    item.clearable || item.type === 'password' || item.type === 'date' || item.type === 'select' || item.type === 'search'
-      ? 'has-suffix'
-      : '',
+    suffixKind ? 'has-suffix' : '',
   ]
     .filter(Boolean)
     .join(' ')
-
-  let suffixKind = null
-  if (item.type === 'password') suffixKind = 'eye'
-  if (item.type === 'date') suffixKind = 'calendar'
-  if (item.type === 'select') suffixKind = 'chevron'
-  if (item.type === 'search') suffixKind = 'search'
-  if (item.clearable) suffixKind = 'clear'
 
   return (
     <div className={controlClassName}>
@@ -687,19 +679,58 @@ function InputControl({ item }) {
   )
 }
 
+function getInputSuffixKind(item) {
+  if (item.clearable) return 'clear'
+  if (item.type === 'password') return 'eye'
+  if (item.type === 'date') return 'calendar'
+  if (item.type === 'select') return 'chevron'
+  if (item.type === 'search') return 'search'
+  return null
+}
+
 function InteractiveInputControl({ item }) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(item.defaultValue || item.value || '')
+  const suffixKind = getInputSuffixKind(item)
+  const showClear = suffixKind === 'clear' && value
+  const isReadOnly = item.type === 'select' || item.type === 'date'
+  const placeholder = item.placeholder || (!value ? item.value : '')
+  const controlClassName = [
+    'input-spec-control',
+    'input-spec-control-real',
+    'input-spec-control-interactive',
+    item.prefix ? 'has-prefix' : '',
+    suffixKind ? 'has-suffix' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <label className="input-spec-control input-spec-control-real input-spec-control-interactive">
-      <input
-        type="text"
-        value={value}
-        placeholder={item.placeholder}
-        onChange={(event) => setValue(event.target.value)}
-        aria-label={item.label}
-      />
-    </label>
+    <div className={controlClassName}>
+      {item.prefix ? (
+        <span className="input-spec-icon input-spec-icon-prefix" aria-hidden="true">
+          <InputIcon kind={item.prefix} />
+        </span>
+      ) : null}
+      <label className="input-spec-input-wrap">
+        <input
+          type="text"
+          value={value}
+          placeholder={placeholder}
+          readOnly={isReadOnly}
+          onChange={(event) => setValue(event.target.value)}
+          aria-label={item.label}
+        />
+      </label>
+      {showClear ? (
+        <button type="button" className="input-spec-clear-btn" onClick={() => setValue('')} aria-label="清空内容">
+          <InputIcon kind="clear" />
+        </button>
+      ) : suffixKind ? (
+        <span className={`input-spec-icon input-spec-icon-suffix${showClear ? '' : suffixKind === 'clear' ? ' input-spec-icon-empty' : ''}`} aria-hidden="true">
+          {suffixKind === 'clear' ? null : <InputIcon kind={suffixKind} />}
+        </span>
+      ) : null}
+    </div>
   )
 }
 
@@ -714,19 +745,30 @@ function FormLabel({ item }) {
 
 function InputShowcaseItem({ item, isForm = false }) {
   if (isForm) {
+    const isInteractiveForm = (item.orientation === 'horizontal' || item.orientation === 'vertical') && item.state !== 'error'
+    const formClassName = `input-form-item input-form-item-${item.orientation}${item.helper ? ' has-helper' : ''}`
+    const showCaption = item.caption && item.state !== 'error'
+
     return (
-      <article className={`input-form-item input-form-item-${item.orientation}`}>
-        <FormLabel item={item} />
-        <InputControl item={{ ...item, state: item.state || 'default' }} />
-        <span className="input-form-caption">{item.caption}</span>
+      <article className={formClassName}>
+        <div className="input-form-label-slot">
+          <FormLabel item={item} />
+        </div>
+        <div className="input-form-control-slot">
+          {isInteractiveForm ? <InteractiveInputControl item={item} /> : <InputControl item={{ ...item, state: item.state || 'default' }} />}
+        </div>
+        {showCaption ? <span className="input-form-caption">{item.caption}</span> : null}
+        {item.helper ? <p className="input-form-helper">{item.helper}</p> : null}
       </article>
     )
   }
 
+  const showLabel = item.label && item.state !== 'error'
+
   return (
-    <article className="input-demo-item">
+    <article className={`input-demo-item${item.helper ? ' has-helper' : ''}`}>
       {item.interactive ? <InteractiveInputControl item={item} /> : <InputControl item={item} />}
-      <span className="input-demo-caption">{item.label}</span>
+      {showLabel ? <span className="input-demo-caption">{item.label}</span> : null}
       {item.helper ? <p className="input-demo-helper">{item.helper}</p> : null}
     </article>
   )
@@ -734,7 +776,11 @@ function InputShowcaseItem({ item, isForm = false }) {
 
 function InputSection({ section }) {
   const isForm = section.key.includes('form')
-  const isBasic = section.key === 'basic'
+  const isSingleDemo =
+    section.key === 'basic' ||
+    section.key === 'icon' ||
+    section.key === 'form-horizontal' ||
+    section.key === 'form-vertical'
 
   return (
     <section className="input-spec-block">
@@ -743,13 +789,15 @@ function InputSection({ section }) {
         {section.note ? <p className="input-spec-note">{section.note}</p> : null}
       </div>
 
-      {section.description ? <p className="input-spec-description">{section.description}</p> : null}
+        {section.description ? <p className="input-spec-description">{section.description}</p> : null}
 
-      {isBasic ? (
-        <div className="input-basic-demo-panel">
-          <InputShowcaseItem item={section.items[0]} isForm={false} />
-        </div>
-      ) : (
+        {isSingleDemo ? (
+          <div className={`input-basic-demo-panel${section.items.length > 1 ? ' is-multi' : ''}`}>
+            {section.items.map((item) => (
+              <InputShowcaseItem key={`${section.key}-${item.caption || item.label}-${item.state || 'default'}`} item={item} isForm={isForm} />
+            ))}
+          </div>
+        ) : (
         <div className={`input-spec-grid${isForm ? ' is-form-grid' : ''}`}>
           {section.items.map((item) => (
             <InputShowcaseItem key={`${section.key}-${item.caption || item.label}-${item.type}`} item={item} isForm={isForm} />
@@ -776,6 +824,458 @@ function InputSystem({ inputSystem }) {
       <div className="input-spec-canvas">
         {inputSystem.sections.map((section) => (
           <InputSection key={section.key} section={section} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+const frameworks = ['Next.js', 'SvelteKit', 'Nuxt.js', 'Remix', 'Astro']
+const groupedFrameworks = [
+  { label: 'React 系', items: ['Next.js', 'Remix'] },
+  { label: '全栈框架', items: ['SvelteKit', 'Nuxt.js'] },
+  { label: '内容站点', items: ['Astro'] },
+]
+const disabledFrameworks = ['Astro']
+const ComboboxContext = createContext(null)
+
+function DropdownChevronIcon({ open = false }) {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className={`dropdown-icon-svg${open ? ' is-open' : ''}`}>
+      <path d="M4.5 6.5L8 10l3.5-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+function DropdownCheckIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className="dropdown-check-svg">
+      <path d="M3.5 8.5L6.4 11.1L12.3 4.9" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+    </svg>
+  )
+}
+
+function DropdownSearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="dropdown-empty-svg">
+      <circle cx="11" cy="11" r="5.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M15.2 15.2L19 19" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
+  )
+}
+
+function Combobox({
+  items,
+  children,
+  defaultValue = '',
+  defaultQuery = '',
+  placeholder = '',
+  disabled = false,
+  clearable = false,
+  visualState = 'default',
+  forceOpen = false,
+  interactive = true,
+  groupedItems = null,
+  disabledItems = [],
+}) {
+  const wrapperRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(forceOpen)
+  const [selectedValue, setSelectedValue] = useState(defaultValue)
+  const [inputValue, setInputValue] = useState(defaultQuery || defaultValue)
+  const [activeValue, setActiveValue] = useState(defaultValue)
+  const allItems = items || groupedItems?.flatMap((group) => group.items) || []
+  const normalizedQuery = inputValue.trim().toLowerCase()
+  const filteredItems = normalizedQuery ? allItems.filter((item) => item.toLowerCase().includes(normalizedQuery)) : allItems
+  const filteredGroups = groupedItems
+    ? groupedItems
+        .map((group) => ({
+          ...group,
+          items: normalizedQuery ? group.items.filter((item) => item.toLowerCase().includes(normalizedQuery)) : group.items,
+        }))
+        .filter((group) => group.items.length)
+    : []
+
+  useEffect(() => {
+    if (!forceOpen) {
+      return undefined
+    }
+
+    setIsOpen(true)
+    return undefined
+  }, [forceOpen])
+
+  useEffect(() => {
+    if (!interactive || forceOpen) {
+      return undefined
+    }
+
+    function handlePointerDown(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false)
+        setInputValue(selectedValue)
+      }
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [forceOpen, interactive, selectedValue])
+
+  const contextValue = {
+    activeValue,
+    clearable,
+    disabled,
+    disabledItems,
+    filteredGroups,
+    filteredItems,
+    forceOpen,
+    groupedItems,
+    inputValue,
+    interactive,
+    isOpen,
+    placeholder,
+    selectedValue,
+    setActiveValue,
+    setInputValue,
+    setIsOpen,
+    setSelectedValue,
+    visualState,
+    wrapperRef,
+  }
+
+  return (
+    <ComboboxContext.Provider value={contextValue}>
+      <div ref={wrapperRef} className="dropdown-combobox">
+        {children}
+      </div>
+    </ComboboxContext.Provider>
+  )
+}
+
+function useComboboxContext() {
+  const context = useContext(ComboboxContext)
+
+  if (!context) {
+    throw new Error('Combobox components must be used within Combobox.')
+  }
+
+  return context
+}
+
+function ComboboxInput({ placeholder = '' }) {
+  const {
+    clearable,
+    disabled,
+    forceOpen,
+    inputValue,
+    interactive,
+    isOpen,
+    selectedValue,
+    setInputValue,
+    setIsOpen,
+    visualState,
+  } = useComboboxContext()
+  const [isHovered, setIsHovered] = useState(false)
+  const showPlaceholder = !inputValue
+  const showClear = clearable && selectedValue && isHovered && !isOpen && !forceOpen
+  const controlClassName = [
+    'dropdown-trigger',
+    `is-${visualState}`,
+    isHovered && !disabled && !isOpen && !forceOpen ? 'is-hover' : '',
+    disabled ? 'is-disabled' : '',
+    forceOpen || isOpen ? 'is-focus-open' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <div className={controlClassName} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      <input
+        type="text"
+        value={inputValue}
+        placeholder={placeholder}
+        readOnly={!interactive || disabled}
+        onFocus={() => {
+          if (!disabled && interactive) {
+            setIsOpen(true)
+          }
+        }}
+        onChange={(event) => {
+          setInputValue(event.target.value)
+          if (!disabled && interactive) {
+            setIsOpen(true)
+          }
+        }}
+        className={showPlaceholder ? 'is-placeholder' : ''}
+      />
+      {showClear ? (
+        <button
+          type="button"
+          className="dropdown-clear-btn"
+          onClick={() => {
+            setInputValue('')
+            setIsOpen(false)
+          }}
+          aria-label="清空已选项"
+        >
+          <InputIcon kind="clear" />
+        </button>
+      ) : (
+        <span className="dropdown-trigger-icon" aria-hidden="true">
+          <DropdownChevronIcon open={forceOpen || isOpen} />
+        </span>
+      )}
+    </div>
+  )
+}
+
+function ComboboxContent({ children }) {
+  const { forceOpen, isOpen } = useComboboxContext()
+
+  if (!forceOpen && !isOpen) {
+    return null
+  }
+
+  return <div className="dropdown-menu">{children}</div>
+}
+
+function ComboboxEmpty({ children }) {
+  const { filteredGroups, filteredItems, groupedItems } = useComboboxContext()
+  const hasResults = groupedItems ? filteredGroups.length > 0 : filteredItems.length > 0
+
+  if (hasResults) {
+    return null
+  }
+
+  return (
+    <div className="dropdown-empty-state">
+      <DropdownSearchIcon />
+      <span>{children}</span>
+    </div>
+  )
+}
+
+function ComboboxList({ children }) {
+  const { filteredGroups, filteredItems, groupedItems } = useComboboxContext()
+
+  if (groupedItems) {
+    return (
+      <div className="dropdown-list dropdown-list-grouped">
+        {filteredGroups.map((group) => (
+          <div key={group.label} className="dropdown-group">
+            <div className="dropdown-group-label">{group.label}</div>
+            {group.items.map((item) => children(item))}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return <div className="dropdown-list">{filteredItems.map((item) => children(item))}</div>
+}
+
+function ComboboxItem({ value, children }) {
+  const { activeValue, disabledItems, setActiveValue, setInputValue, setIsOpen, setSelectedValue } = useComboboxContext()
+  const isActive = activeValue === value
+  const isDisabled = disabledItems.includes(value)
+
+  return (
+    <button
+      type="button"
+      className={`dropdown-item${isActive ? ' is-active' : ''}${isDisabled ? ' is-disabled' : ''}`}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={() => {
+        if (isDisabled) {
+          return
+        }
+
+        setActiveValue(value)
+        setSelectedValue(value)
+        setInputValue(value)
+        setIsOpen(false)
+      }}
+      disabled={isDisabled}
+    >
+      <span>{children}</span>
+      {isActive ? <DropdownCheckIcon /> : null}
+    </button>
+  )
+}
+
+function ExampleCombobox(props) {
+  return (
+    <Combobox items={frameworks} disabledItems={disabledFrameworks} {...props}>
+      <ComboboxInput placeholder="选择一个框架" />
+      <ComboboxContent>
+        <ComboboxEmpty>未找到项目。</ComboboxEmpty>
+        <ComboboxList>
+          {(item) => (
+            <ComboboxItem key={item} value={item}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  )
+}
+
+function DropdownSpecCard({ item }) {
+  if (item.type === 'open-standard') {
+    return (
+      <article className="dropdown-spec-item dropdown-spec-item-open">
+        <h4>{item.label}</h4>
+        <ExampleCombobox defaultValue={item.value} forceOpen={true} interactive={false} />
+      </article>
+    )
+  }
+
+  if (item.type === 'interactive-basic') {
+    return (
+      <article className="dropdown-spec-item dropdown-spec-item-single">
+        <ExampleCombobox clearable={true} />
+        <span className="dropdown-spec-caption">{item.label}</span>
+        {item.helper ? <p className="dropdown-spec-helper">{item.helper}</p> : null}
+      </article>
+    )
+  }
+
+  if (item.type === 'open-grouped') {
+    return (
+      <article className="dropdown-spec-item dropdown-spec-item-open">
+        <h4>{item.label}</h4>
+        <Combobox
+          items={frameworks}
+          groupedItems={groupedFrameworks}
+          defaultValue={item.value}
+          forceOpen={true}
+          interactive={false}
+        >
+          <ComboboxInput placeholder="选择一个框架" />
+          <ComboboxContent>
+            <ComboboxList>
+              {(groupItem) => (
+                <ComboboxItem key={groupItem} value={groupItem}>
+                  {groupItem}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </article>
+    )
+  }
+
+  if (item.type === 'open-empty') {
+    return (
+      <article className="dropdown-spec-item dropdown-spec-item-open">
+        <h4>{item.label}</h4>
+        <Combobox
+          items={[]}
+          placeholder={item.placeholder}
+          forceOpen={true}
+          interactive={false}
+        >
+          <ComboboxInput placeholder={item.placeholder} />
+          <ComboboxContent>
+            <ComboboxEmpty>无匹配数据</ComboboxEmpty>
+            <ComboboxList>
+              {(framework) => (
+                <ComboboxItem key={framework} value={framework}>
+                  {framework}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </article>
+    )
+  }
+
+  const comboboxProps = {
+    items: frameworks,
+    interactive: false,
+    placeholder: item.placeholder || '请选择一项',
+  }
+
+  if (item.type === 'hover') {
+    comboboxProps.visualState = 'hover'
+  }
+
+  if (item.type === 'selected') {
+    comboboxProps.defaultValue = item.value
+  }
+
+  if (item.type === 'clearable') {
+    comboboxProps.defaultValue = item.value
+    comboboxProps.clearable = true
+    comboboxProps.visualState = 'hover'
+  }
+
+  if (item.type === 'error') {
+    comboboxProps.defaultValue = item.value
+    comboboxProps.visualState = 'error'
+  }
+
+  if (item.type === 'disabled') {
+    comboboxProps.disabled = true
+  }
+
+  if (item.type === 'disabled-filled') {
+    comboboxProps.disabled = true
+    comboboxProps.defaultValue = item.value
+  }
+
+  return (
+    <article className="dropdown-spec-item">
+      <h4>{item.label}</h4>
+      <Combobox {...comboboxProps}>
+        <ComboboxInput placeholder={comboboxProps.placeholder} />
+      </Combobox>
+    </article>
+  )
+}
+
+function DropdownSection({ section }) {
+  const isSingleDemo = section.key === 'basic'
+
+  return (
+    <section className="dropdown-spec-block">
+      <div className="dropdown-spec-head">
+        <h3>{section.title}</h3>
+        <p>{section.description}</p>
+      </div>
+
+      {isSingleDemo ? (
+        <div className="dropdown-spec-panel dropdown-spec-panel-single">
+          <DropdownSpecCard item={section.items[0]} />
+        </div>
+      ) : (
+        <div className={`dropdown-spec-panel dropdown-spec-panel-${section.key}`}>
+          {section.items.map((item) => (
+            <DropdownSpecCard key={`${section.key}-${item.label}`} item={item} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function DropdownSystem({ dropdownSystem }) {
+  return (
+    <section className="doc-section dropdown-system-section" id="dropdowns">
+      <div className="section-heading">
+        <span className="section-kicker">SELECT</span>
+        <h2>{dropdownSystem.title}</h2>
+        <p>{dropdownSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro">
+        <p>{dropdownSystem.intro}</p>
+      </div>
+
+      <div className="dropdown-spec-canvas">
+        {dropdownSystem.sections.map((section) => (
+          <DropdownSection key={section.key} section={section} />
         ))}
       </div>
     </section>
@@ -946,6 +1446,7 @@ function App() {
     cornerSystem,
     shadowSystem,
     inputSystem,
+    dropdownSystem,
     components,
   } = specDocument
 
@@ -994,6 +1495,7 @@ function App() {
           <CornerSystem cornerSystem={cornerSystem} onCopy={handleCopy} />
           <ShadowSystem shadowSystem={shadowSystem} onCopy={handleCopy} />
           <InputSystem inputSystem={inputSystem} />
+          <DropdownSystem dropdownSystem={dropdownSystem} />
           <Components components={components} />
         </main>
 

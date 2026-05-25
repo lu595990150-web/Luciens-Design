@@ -1,4 +1,4 @@
-const onLight = '#1D2129'
+﻿const onLight = '#1D2129'
 const onDark = '#FFFFFF'
 
 function makeScale(tokens) {
@@ -32,6 +32,7 @@ export const specDocument = {
     { id: 'corners', label: '圆角规范' },
     { id: 'surfaces', label: '投影规范' },
     { id: 'inputs', label: '输入框规范' },
+    { id: 'dropdowns', label: '下拉框规范' },
     { id: 'components', label: '组件示例' },
   ],
   principles: [
@@ -712,63 +713,120 @@ export const specDocument = {
     intro:
       '输入框用于文本录入、筛选、检索、密码查看和日期选择等场景。文档按基础状态、带图标、横版表单、竖版表单四组整理，方便设计与开发对齐。',
     sections: [
-      {
-        key: 'basic',
-        title: '1. 基础用法',
-        description: '通过鼠标或键盘输入内容。',
+        {
+          key: 'basic',
+          title: '1. 基础用法',
+          description: '通过鼠标或键盘输入内容。',
+          items: [
+            {
+              label: '基础输入框',
+              type: 'text',
+              placeholder: '请输入内容',
+              state: 'default',
+              interactive: true,
+              helper: '默认展示常规状态；鼠标移入触发 Hover，点击后触发聚焦并可输入。',
+            },
+            {
+              label: '错误状态',
+              type: 'text',
+              value: '请输入内容',
+              state: 'error',
+              helper: '你的内容存在错误',
+            },
+          ],
+        },
+        {
+          key: 'icon',
+          title: '2. 带图标输入框',
+        description: '默认以带图标的常规输入框为主，通过同一个示例承载输入内容、hover 和聚焦状态。',
         items: [
           {
-            label: '基础输入框',
+            label: '带图标输入框',
             type: 'text',
             placeholder: '请输入内容',
             state: 'default',
-            interactive: true,
-            helper: '默认展示常规状态；鼠标移入触发 Hover，点击后触发聚焦并可输入。',
-          },
-        ],
-      },
+              prefix: 'search',
+              clearable: true,
+              interactive: true,
+              helper: '默认展示常规状态；输入内容后显示清除入口，鼠标移入触发 Hover，点击后触发聚焦并可输入。',
+            },
+            {
+              label: '错误状态',
+              type: 'text',
+              value: '安道教育',
+              state: 'error',
+              prefix: 'search',
+              clearable: true,
+              helper: '你的内容存在错误',
+            },
+          ],
+        },
+        {
+          key: 'form-horizontal',
+          title: '3. 表单输入框 / 横板',
+          description: '横版表单默认展示标题加输入框的基础组合。',
+          items: [
+            { caption: '输入-常规', type: 'text', orientation: 'horizontal', required: true, label: '安道教育', placeholder: 'Please Enter' },
+            {
+              caption: '错误状态',
+              type: 'text',
+              orientation: 'horizontal',
+              required: true,
+              label: '安道教育',
+              value: 'Please Enter',
+              state: 'error',
+              helper: '你的内容存在错误',
+            },
+          ],
+        },
+        {
+          key: 'form-vertical',
+          title: '4. 表单输入框 / 竖板',
+          note: '考虑到多语言场景下，优先默认使用竖版表单输入框',
+          description: '竖版表单默认展示标题加输入框的基础组合。通过同一个示例承载 Hover、聚焦和输入状态。',
+          items: [
+            { caption: '输入-常规', type: 'text', orientation: 'vertical', required: true, label: '安道教育', placeholder: 'Please Enter' },
+            {
+              caption: '错误状态',
+              type: 'text',
+              orientation: 'vertical',
+              required: true,
+              label: '安道教育',
+              value: 'Please Enter',
+              state: 'error',
+              helper: '你的内容存在错误',
+            },
+          ],
+        },
+    ],
+  },
+  dropdownSystem: {
+    title: '下拉框规范',
+    description:
+      '本节依据 Figma 节点 `496:3241` 的下拉框规范页整理，覆盖关闭态、展开态、分组展示和空状态，便于设计与前端对齐。',
+    intro: '下拉框用于在多个备选项中进行单选。默认使用 36px 高度、8px 圆角和中性色描边，并在展开时保持输入框与菜单的视觉连续性。',
+    sections: [
       {
-        key: 'icon',
-        title: '2. 带图标输入框',
+        key: 'basic',
+        title: '1. 基础表单状态',
+        description: '默认展示选择器未展开的空状态，并通过同一个示例承载 Hover、聚焦、悬浮显清空和已选择的交互。',
         items: [
-          { label: '默认状态', type: 'text', placeholder: '请输入内容', state: 'default', prefix: 'search' },
-          { label: '输入内容状态', type: 'text', value: '安道教育', state: 'filled', prefix: 'search' },
-          { label: 'Hover 状态', type: 'text', value: '安道教育', state: 'hover', prefix: 'search', clearable: true },
-          { label: '聚焦状态', type: 'text', value: '安道教育', state: 'focus', prefix: 'search', clearable: true },
-          { label: 'disabled input', type: 'text', placeholder: '请输入内容', state: 'disabled', prefix: 'search' },
           {
-            label: '错误状态',
-            type: 'text',
-            value: '安道教育',
-            state: 'error',
-            prefix: 'search',
-            helper: '你的内容存在错误',
+            label: '基础下拉框',
+            type: 'interactive-basic',
+            placeholder: '请选择一项',
+            helper: '默认展示空状态；鼠标移入触发 Hover，点击后聚焦并展开，选择后进入已选择状态，再次悬浮显示清空入口。',
           },
         ],
       },
       {
-        key: 'form-horizontal',
-        title: '3. 表单输入框 / 横板',
+        key: 'open',
+        title: '2. 菜单展开与高亮状态',
+        description: '展示菜单强制展开时的视觉结构，包括列表选中项高亮、不可选项置灰。',
         items: [
-          { caption: '筛选-强制', type: 'select', orientation: 'horizontal', required: true, label: '安道教育', placeholder: '请选择' },
-          { caption: '筛选-常规', type: 'select', orientation: 'horizontal', label: '安道教育', placeholder: '请选择' },
-          { caption: '输入-常规', type: 'text', orientation: 'horizontal', required: true, label: '安道教育', placeholder: 'Please Enter' },
-          { caption: '日期筛选', type: 'date', orientation: 'horizontal', required: true, label: '安道教育', value: '2020/01/01（Today）' },
-          { caption: '查询', type: 'search', orientation: 'horizontal', label: '安道教育', placeholder: 'Search for' },
-          { caption: '密码型', type: 'password', orientation: 'horizontal', label: '安道教育', placeholder: 'Please Enter' },
-        ],
-      },
-      {
-        key: 'form-vertical',
-        title: '4. 表单输入框 / 竖板',
-        note: '考虑到多语言场景下，优先默认使用竖版表单输入框',
-        items: [
-          { caption: '筛选-强制', type: 'select', orientation: 'vertical', required: true, label: '安道教育', placeholder: '请选择' },
-          { caption: '筛选-常规', type: 'select', orientation: 'vertical', label: '安道教育', placeholder: '请选择' },
-          { caption: '输入-常规', type: 'text', orientation: 'vertical', required: true, label: '安道教育', placeholder: 'Please Enter' },
-          { caption: '日期筛选', type: 'date', orientation: 'vertical', required: true, label: '安道教育', value: '2020/01/01（Today）' },
-          { caption: '查询', type: 'search', orientation: 'vertical', label: '安道教育', placeholder: 'Search for' },
-          { caption: '密码型', type: 'password', orientation: 'vertical', label: '安道教育', placeholder: 'Please Enter' },
+          { label: 'Focus & Open (标准展开)', type: 'open-standard', value: 'Nuxt.js' },
+          { label: 'Grouped (带分组展示)', type: 'open-grouped', value: 'Next.js' },
+          { label: 'Empty (无数据)', type: 'open-empty', placeholder: '选择数据', query: 'Angular' },
         ],
       },
     ],
