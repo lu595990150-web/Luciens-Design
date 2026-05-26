@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import './App.css'
 import questionFillIcon from './assets/question-fill.svg'
+import dropdownArrowIcon from './assets/dropdown-arrow.svg'
+import passwordHideIcon from './assets/password-hide.svg'
+import passwordShowIcon from './assets/password-show.svg'
 import { specDocument } from './data/specDocument'
 
 function InputIcon({ kind }) {
@@ -23,12 +26,11 @@ function InputIcon({ kind }) {
   }
 
   if (kind === 'eye') {
-    return (
-      <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
-        <path d="M1.5 8C3.1 5.4 5.2 4 8 4s4.9 1.4 6.5 4c-1.6 2.6-3.7 4-6.5 4S3.1 10.6 1.5 8Z" fill="none" stroke="currentColor" strokeWidth="1.3" />
-        <circle cx="8" cy="8" r="1.9" fill="none" stroke="currentColor" strokeWidth="1.3" />
-      </svg>
-    )
+    return <img src={passwordShowIcon} alt="" aria-hidden="true" className="input-icon-svg" />
+  }
+
+  if (kind === 'eye-off') {
+    return <img src={passwordHideIcon} alt="" aria-hidden="true" className="input-icon-svg" />
   }
 
   if (kind === 'calendar') {
@@ -690,7 +692,8 @@ function getInputSuffixKind(item) {
 
 function InteractiveInputControl({ item }) {
   const [value, setValue] = useState(item.defaultValue || item.value || '')
-  const suffixKind = getInputSuffixKind(item)
+  const [showPassword, setShowPassword] = useState(false)
+  const suffixKind = item.type === 'password' ? (showPassword ? 'eye' : 'eye-off') : getInputSuffixKind(item)
   const showClear = suffixKind === 'clear' && value
   const isReadOnly = item.type === 'select' || item.type === 'date'
   const placeholder = item.placeholder || (!value ? item.value : '')
@@ -711,23 +714,32 @@ function InteractiveInputControl({ item }) {
           <InputIcon kind={item.prefix} />
         </span>
       ) : null}
-      <label className="input-spec-input-wrap">
-        <input
-          type="text"
-          value={value}
-          placeholder={placeholder}
-          readOnly={isReadOnly}
-          onChange={(event) => setValue(event.target.value)}
-          aria-label={item.label}
-        />
-      </label>
-      {showClear ? (
+        <label className="input-spec-input-wrap">
+          <input
+            type={item.type === 'password' && !showPassword ? 'password' : 'text'}
+            value={value}
+            placeholder={placeholder}
+            readOnly={isReadOnly}
+            onChange={(event) => setValue(event.target.value)}
+            aria-label={item.label}
+          />
+        </label>
+        {showClear ? (
         <button type="button" className="input-spec-clear-btn" onClick={() => setValue('')} aria-label="清空内容">
           <InputIcon kind="clear" />
-        </button>
-      ) : suffixKind ? (
-        <span className={`input-spec-icon input-spec-icon-suffix${showClear ? '' : suffixKind === 'clear' ? ' input-spec-icon-empty' : ''}`} aria-hidden="true">
-          {suffixKind === 'clear' ? null : <InputIcon kind={suffixKind} />}
+          </button>
+        ) : item.type === 'password' ? (
+          <button
+            type="button"
+            className="input-spec-clear-btn"
+            onClick={() => setShowPassword((current) => !current)}
+            aria-label={showPassword ? '隐藏密码' : '显示密码'}
+          >
+            <InputIcon kind={suffixKind} />
+          </button>
+        ) : suffixKind ? (
+          <span className={`input-spec-icon input-spec-icon-suffix${showClear ? '' : suffixKind === 'clear' ? ' input-spec-icon-empty' : ''}`} aria-hidden="true">
+            {suffixKind === 'clear' ? null : <InputIcon kind={suffixKind} />}
         </span>
       ) : null}
     </div>
@@ -780,7 +792,8 @@ function InputSection({ section }) {
     section.key === 'basic' ||
     section.key === 'icon' ||
     section.key === 'form-horizontal' ||
-    section.key === 'form-vertical'
+    section.key === 'form-vertical' ||
+    section.key === 'password'
 
   return (
     <section className="input-spec-block">
@@ -837,13 +850,13 @@ const groupedFrameworks = [
   { label: '内容站点', items: ['Astro'] },
 ]
 const disabledFrameworks = ['Astro']
+const multipleDropdownItems = ['第一项选项', '第二项选项', '第三项选项', '已禁用的选项', '第五项内容较长的选项展示']
+const multipleDisabledItems = ['已禁用的选项']
 const ComboboxContext = createContext(null)
 
 function DropdownChevronIcon({ open = false }) {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className={`dropdown-icon-svg${open ? ' is-open' : ''}`}>
-      <path d="M4.5 6.5L8 10l3.5-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
-    </svg>
+    <img src={dropdownArrowIcon} alt="" aria-hidden="true" className={`dropdown-icon-svg${open ? ' is-open' : ''}`} />
   )
 }
 
@@ -877,6 +890,7 @@ function Combobox({
   interactive = true,
   groupedItems = null,
   disabledItems = [],
+  searchable = false,
 }) {
   const wrapperRef = useRef(null)
   const [isOpen, setIsOpen] = useState(forceOpen)
@@ -885,12 +899,13 @@ function Combobox({
   const [activeValue, setActiveValue] = useState(defaultValue)
   const allItems = items || groupedItems?.flatMap((group) => group.items) || []
   const normalizedQuery = inputValue.trim().toLowerCase()
-  const filteredItems = normalizedQuery ? allItems.filter((item) => item.toLowerCase().includes(normalizedQuery)) : allItems
+  const shouldFilter = normalizedQuery && normalizedQuery !== selectedValue.trim().toLowerCase()
+  const filteredItems = shouldFilter ? allItems.filter((item) => item.toLowerCase().includes(normalizedQuery)) : allItems
   const filteredGroups = groupedItems
     ? groupedItems
         .map((group) => ({
           ...group,
-          items: normalizedQuery ? group.items.filter((item) => item.toLowerCase().includes(normalizedQuery)) : group.items,
+          items: shouldFilter ? group.items.filter((item) => item.toLowerCase().includes(normalizedQuery)) : group.items,
         }))
         .filter((group) => group.items.length)
     : []
@@ -938,6 +953,7 @@ function Combobox({
     setInputValue,
     setIsOpen,
     setSelectedValue,
+    searchable,
     visualState,
     wrapperRef,
   }
@@ -970,13 +986,17 @@ function ComboboxInput({ placeholder = '' }) {
     interactive,
     isOpen,
     selectedValue,
+    setActiveValue,
     setInputValue,
     setIsOpen,
+    setSelectedValue,
+    searchable,
     visualState,
   } = useComboboxContext()
   const [isHovered, setIsHovered] = useState(false)
   const showPlaceholder = !inputValue
   const showClear = clearable && selectedValue && isHovered && !isOpen && !forceOpen
+  const trailingIconKind = searchable ? 'search' : 'chevron'
   const controlClassName = [
     'dropdown-trigger',
     `is-${visualState}`,
@@ -1012,6 +1032,8 @@ function ComboboxInput({ placeholder = '' }) {
           type="button"
           className="dropdown-clear-btn"
           onClick={() => {
+            setActiveValue('')
+            setSelectedValue('')
             setInputValue('')
             setIsOpen(false)
           }}
@@ -1021,7 +1043,7 @@ function ComboboxInput({ placeholder = '' }) {
         </button>
       ) : (
         <span className="dropdown-trigger-icon" aria-hidden="true">
-          <DropdownChevronIcon open={forceOpen || isOpen} />
+          {trailingIconKind === 'search' ? <InputIcon kind="search" /> : <DropdownChevronIcon open={forceOpen || isOpen} />}
         </span>
       )}
     </div>
@@ -1102,9 +1124,11 @@ function ComboboxItem({ value, children }) {
 }
 
 function ExampleCombobox(props) {
+  const { placeholder = '选择一个框架', ...comboboxProps } = props
+
   return (
-    <Combobox items={frameworks} disabledItems={disabledFrameworks} {...props}>
-      <ComboboxInput placeholder="选择一个框架" />
+    <Combobox items={frameworks} disabledItems={disabledFrameworks} {...comboboxProps}>
+      <ComboboxInput placeholder={placeholder} />
       <ComboboxContent>
         <ComboboxEmpty>未找到项目。</ComboboxEmpty>
         <ComboboxList>
@@ -1116,6 +1140,118 @@ function ExampleCombobox(props) {
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
+  )
+}
+
+function MultiSelectDemo({
+  defaultSelected = ['第一项选项', '第三项选项'],
+  disabled = false,
+  clearable = false,
+  defaultOpen = false,
+  interactive = true,
+}) {
+  const [selectedValues, setSelectedValues] = useState(defaultSelected)
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [isHovered, setIsHovered] = useState(false)
+  const showClear = clearable && selectedValues.length > 0 && isHovered && !disabled && !isOpen
+  const triggerClassName = [
+    'dropdown-trigger',
+    'dropdown-trigger-multiple',
+    isHovered && !disabled && !isOpen ? 'is-hover' : '',
+    isOpen ? 'is-focus-open' : '',
+    disabled ? 'is-disabled' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  function toggleValue(value) {
+    if (!interactive || disabled || multipleDisabledItems.includes(value)) {
+      return
+    }
+
+    setSelectedValues((current) => (current.includes(value) ? current.filter((item) => item !== value) : [...current, value]))
+  }
+
+  return (
+    <div className="dropdown-combobox">
+      <div
+        className={triggerClassName}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          if (!interactive || disabled) {
+            return
+          }
+
+          setIsOpen((current) => !current)
+        }}
+      >
+        <div className="dropdown-multi-tags">
+          {selectedValues.map((value) => (
+            <span key={value} className={`dropdown-tag${disabled ? ' is-disabled' : ''}`}>
+              <span>{value}</span>
+              {!disabled ? (
+                <button
+                  type="button"
+                  className="dropdown-tag-close"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setSelectedValues((current) => current.filter((item) => item !== value))
+                  }}
+                  aria-label={`移除${value}`}
+                >
+                  <InputIcon kind="clear" />
+                </button>
+              ) : null}
+            </span>
+          ))}
+        </div>
+
+        {showClear ? (
+          <button
+            type="button"
+            className="dropdown-clear-btn"
+            onClick={(event) => {
+              event.stopPropagation()
+              setSelectedValues([])
+              setIsOpen(false)
+            }}
+            aria-label="清空所有选项"
+          >
+            <InputIcon kind="clear" />
+          </button>
+        ) : (
+          <span className="dropdown-trigger-icon" aria-hidden="true">
+            <DropdownChevronIcon open={isOpen} />
+          </span>
+        )}
+      </div>
+
+      {isOpen ? (
+        <div className="dropdown-menu">
+          <div className="dropdown-list">
+            {multipleDropdownItems.map((item) => {
+              const isActive = selectedValues.includes(item)
+              const isDisabled = multipleDisabledItems.includes(item)
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  className={`dropdown-item${isActive ? ' is-active' : ''}${isDisabled ? ' is-disabled' : ''}`}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => toggleValue(item)}
+                  disabled={isDisabled}
+                >
+                  <span>{item}</span>
+                  {isActive ? <DropdownCheckIcon /> : null}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
   )
 }
 
@@ -1135,6 +1271,50 @@ function DropdownSpecCard({ item }) {
         <ExampleCombobox clearable={true} />
         <span className="dropdown-spec-caption">{item.label}</span>
         {item.helper ? <p className="dropdown-spec-helper">{item.helper}</p> : null}
+      </article>
+    )
+  }
+
+  if (item.type === 'interactive-searchable') {
+    return (
+      <article className="dropdown-spec-item dropdown-spec-item-single">
+        <ExampleCombobox clearable={true} searchable={true} placeholder="输入以搜索..." />
+        <span className="dropdown-spec-caption">{item.label}</span>
+        {item.helper ? <p className="dropdown-spec-helper">{item.helper}</p> : null}
+      </article>
+    )
+  }
+
+  if (item.type.startsWith('multiple-')) {
+    const multipleProps = {
+      defaultSelected: ['第一项选项', '第三项选项'],
+    }
+
+    if (item.type === 'multiple-disabled') {
+      multipleProps.disabled = true
+      multipleProps.defaultSelected = ['第一项选项', '第二项选项']
+      multipleProps.interactive = false
+    }
+
+    if (item.type === 'multiple-clearable') {
+      multipleProps.clearable = true
+      multipleProps.defaultSelected = ['第一项选项', '第二项选项', '第三项选项']
+    }
+
+    if (item.type === 'multiple-opened') {
+      multipleProps.defaultOpen = true
+      multipleProps.defaultSelected = ['第一项选项', '第三项选项']
+    }
+
+    return (
+      <article
+        className={`dropdown-spec-item dropdown-spec-item-multiple dropdown-spec-item-${item.type}${
+          item.type === 'multiple-opened' ? ' dropdown-spec-item-multiple-open' : ''
+        }`}
+      >
+        <h4>{item.label}</h4>
+        <MultiSelectDemo {...multipleProps} />
+        {item.helper ? <p className="dropdown-spec-note">{item.helper}</p> : null}
       </article>
     )
   }
@@ -1236,7 +1416,7 @@ function DropdownSpecCard({ item }) {
 }
 
 function DropdownSection({ section }) {
-  const isSingleDemo = section.key === 'basic'
+  const isSingleDemo = section.key === 'basic' || section.key === 'searchable'
 
   return (
     <section className="dropdown-spec-block">

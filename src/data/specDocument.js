@@ -32,7 +32,7 @@ export const specDocument = {
     { id: 'corners', label: '圆角规范' },
     { id: 'surfaces', label: '投影规范' },
     { id: 'inputs', label: '输入框规范' },
-    { id: 'dropdowns', label: '下拉框规范' },
+    { id: 'dropdowns', label: '选择器规范' },
     { id: 'components', label: '组件示例' },
   ],
   principles: [
@@ -711,7 +711,7 @@ export const specDocument = {
     description:
       '本节依据 Figma 节点 `473:1747` 的输入框规范页整理，并参考 Arco Input 文档的分组方式输出到当前规范站中。',
     intro:
-      '输入框用于文本录入、筛选、检索、密码查看和日期选择等场景。文档按基础状态、带图标、横版表单、竖版表单四组整理，方便设计与开发对齐。',
+      '输入框用于文本录入、筛选、检索、密码查看和日期选择等场景。文档按基础状态、带图标、横版表单、竖版表单和密码型五组整理，方便设计与开发对齐。',
     sections: [
         {
           key: 'basic',
@@ -798,13 +798,26 @@ export const specDocument = {
             },
           ],
         },
+        {
+          key: 'password',
+          title: '5. 密码型输入框',
+          description: '用于密码录入场景。默认展示隐藏内容状态，并通过右侧眼睛图标切换明文与密文。',
+          items: [
+            {
+              type: 'password',
+              interactive: true,
+              value: 'password',
+              placeholder: 'Please Enter',
+            },
+          ],
+        },
     ],
   },
   dropdownSystem: {
-    title: '下拉框规范',
+    title: '选择器规范',
     description:
-      '本节依据 Figma 节点 `496:3241` 的下拉框规范页整理，覆盖关闭态、展开态、分组展示和空状态，便于设计与前端对齐。',
-    intro: '下拉框用于在多个备选项中进行单选。默认使用 36px 高度、8px 圆角和中性色描边，并在展开时保持输入框与菜单的视觉连续性。',
+      '本节依据 Figma 节点 `496:3241` 的选择器规范页整理，覆盖关闭态、展开态、分组展示和空状态，便于设计与前端对齐。',
+    intro: '选择器用于在多个备选项中进行单选。默认使用 36px 高度、8px 圆角和中性色描边，并在展开时保持输入框与菜单的视觉连续性。',
     sections: [
       {
         key: 'basic',
@@ -819,18 +832,58 @@ export const specDocument = {
           },
         ],
       },
-      {
-        key: 'open',
-        title: '2. 菜单展开与高亮状态',
-        description: '展示菜单强制展开时的视觉结构，包括列表选中项高亮、不可选项置灰。',
-        items: [
-          { label: 'Focus & Open (标准展开)', type: 'open-standard', value: 'Nuxt.js' },
-          { label: 'Grouped (带分组展示)', type: 'open-grouped', value: 'Next.js' },
-          { label: 'Empty (无数据)', type: 'open-empty', placeholder: '选择数据', query: 'Angular' },
-        ],
-      },
-    ],
-  },
+        {
+          key: 'open',
+          title: '2. 菜单展开与高亮状态',
+          description: '展示菜单强制展开时的视觉结构，包括列表选中项高亮、不可选项置灰。',
+          items: [
+            { label: 'Focus & Open (标准展开)', type: 'open-standard', value: 'Nuxt.js' },
+            { label: 'Grouped (带分组展示)', type: 'open-grouped', value: 'Next.js' },
+            { label: 'Empty (无数据)', type: 'open-empty', placeholder: '选择数据', query: 'Angular' },
+          ],
+        },
+        {
+          key: 'searchable',
+          title: '3. 搜索功能支持 (Searchable)',
+          description: '带搜索框的单选选择器，允许用户输入文字快速过滤列表。',
+          items: [
+            {
+              label: '支持搜索的下拉框',
+              type: 'interactive-searchable',
+              placeholder: '输入以搜索...',
+              helper: '右侧图标在聚焦展开后切换为搜索态；输入内容可过滤列表，选中后交互逻辑与基础下拉框保持一致。',
+            },
+          ],
+        },
+        {
+          key: 'multiple',
+          title: '4. 多选模式 (Multiple)',
+          description: '支持同时选择多个值，以 Tag 标签的形式呈现在输入框内。',
+          items: [
+            {
+              label: 'Multiple Normal (未展开的多选)',
+              type: 'multiple-normal',
+              helper: '默认展示已选标签，点击后展开多选列表。',
+            },
+            {
+              label: 'Multiple Disabled (禁用的多选)',
+              type: 'multiple-disabled',
+              helper: '禁用态保留已选标签展示，但不可继续操作。',
+            },
+            {
+              label: 'Multiple Clearable (悬浮一键清空)',
+              type: 'multiple-clearable',
+              helper: '鼠标移入且存在已选值时，右侧显示一键清空入口。',
+            },
+            {
+              label: 'Multiple Opened (多选列表展开)',
+              type: 'multiple-opened',
+              helper: '多选列表点击后不会关闭，支持多个选项同时打钩。',
+            },
+          ],
+        },
+      ],
+    },
   components: [
     {
       kind: 'button',
