@@ -4,6 +4,21 @@ import questionFillIcon from './assets/question-fill.svg'
 import dropdownArrowIcon from './assets/dropdown-arrow.svg'
 import passwordHideIcon from './assets/password-hide.svg'
 import passwordShowIcon from './assets/password-show.svg'
+import buttonSearchIcon from './assets/button-search.svg'
+import buttonDownloadIcon from './assets/button-download.svg'
+import buttonSettingIcon from './assets/button-setting.svg'
+import buttonDeleteIcon from './assets/button-delete.svg'
+import sortDownDefaultIcon from './assets/sort-down-default.svg'
+import sortUpDefaultIcon from './assets/sort-up-default.svg'
+import sortDownActiveIcon from './assets/sort-down-active.svg'
+import sortUpActiveIcon from './assets/sort-up-active.svg'
+import filterDefaultIcon from './assets/filter-default.svg'
+import filterActiveIcon from './assets/filter-active.svg'
+import tableSortCustomIcon from './assets/table-sort-custom.svg'
+import tableSortDownCustomIcon from './assets/table-sort-down-custom.svg'
+import tableSortUpCustomIcon from './assets/table-sort-up-custom.svg'
+import tableFilterCustomIcon from './assets/table-filter-custom.svg'
+import tableFolderIcon from './assets/table-folder.svg'
 import { specDocument } from './data/specDocument'
 
 function InputIcon({ kind }) {
@@ -821,6 +836,570 @@ function InputSection({ section }) {
   )
 }
 
+function ButtonGlyph({ kind }) {
+  if (kind === 'search') {
+    return <img src={buttonSearchIcon} alt="" aria-hidden="true" className="button-spec-icon-svg" />
+  }
+
+  if (kind === 'download') {
+    return <img src={buttonDownloadIcon} alt="" aria-hidden="true" className="button-spec-icon-svg" />
+  }
+
+  if (kind === 'setting') {
+    return <img src={buttonSettingIcon} alt="" aria-hidden="true" className="button-spec-icon-svg" />
+  }
+
+  if (kind === 'plus' || kind === 'plus-square') {
+    return (
+      <svg viewBox="0 0 16 16" aria-hidden="true" className="button-spec-icon-svg">
+        <path d="M8 3.3V12.7M3.3 8H12.7" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+      </svg>
+    )
+  }
+
+  if (kind === 'delete') {
+    return <img src={buttonDeleteIcon} alt="" aria-hidden="true" className="button-spec-icon-svg" />
+  }
+
+  return null
+}
+
+function SpecButton({ button, size = 'md', block = false }) {
+  const isDarkPill = button.variant === 'dark-pill'
+  const className = [
+    'button-spec-button',
+    `is-${button.variant}`,
+    `is-size-${size}`,
+    button.state ? `is-${button.state}` : '',
+    button.iconOnly ? 'is-icon-only' : '',
+    block ? 'is-block' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <button type="button" className={className}>
+      {button.icon ? <span className={`button-spec-icon${isDarkPill ? ' is-dark-pill-icon' : ''}`}><ButtonGlyph kind={button.icon} /></span> : null}
+      {button.label ? <span>{button.label}</span> : null}
+    </button>
+  )
+}
+
+function ButtonSection({ section, footnote }) {
+  if (section.key === 'states') {
+    return (
+      <section className="button-spec-block">
+        <div className="button-spec-head">
+          <h3>{section.title}</h3>
+          <p>{section.description}</p>
+        </div>
+
+        <div className="button-spec-panel button-spec-panel-states">
+          {section.rows.map((row) => (
+            <div key={row.label} className="button-spec-state-row">
+              <span className="button-spec-state-label">{row.label}</span>
+              <div className="button-spec-state-buttons">
+                {row.buttons.map((button) => (
+                  <SpecButton key={`${row.label}-${button.variant}`} button={button} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (section.key === 'sizes') {
+    return (
+      <section className="button-spec-block">
+        <div className="button-spec-head">
+          <h3>{section.title}</h3>
+          <p>{section.description}</p>
+        </div>
+
+        <div className="button-spec-panel button-spec-panel-sizes">
+          {section.sizes.map((item) => (
+            <div key={item.note} className="button-spec-size-item">
+              <SpecButton button={{ label: item.label, variant: 'primary' }} size={item.size} />
+              <span>{item.note}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (section.key === 'icons') {
+    return (
+      <section className="button-spec-block">
+        <div className="button-spec-head">
+          <h3>{section.title}</h3>
+          <p>{section.description}</p>
+        </div>
+
+        <div className="button-spec-panel button-spec-panel-icons">
+          {section.buttons.map((button, index) => (
+            <div key={`${button.variant}-${button.label || index}`} className="button-spec-icon-item">
+              <SpecButton button={button} />
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (section.key === 'block') {
+    return (
+      <section className="button-spec-block">
+        <div className="button-spec-head">
+          <h3>{section.title}</h3>
+          <p>{section.description}</p>
+        </div>
+
+        <div className="button-spec-block-wrap">
+          <div className="button-spec-panel button-spec-panel-block">
+            {section.blocks.map((button) => (
+              <SpecButton key={button.label} button={button} block={true} />
+            ))}
+          </div>
+        </div>
+
+        {footnote ? <p className="button-spec-footnote">{footnote}</p> : null}
+      </section>
+    )
+  }
+
+  return (
+    <section className="button-spec-block">
+      <div className="button-spec-head">
+        <h3>{section.title}</h3>
+        <p>{section.description}</p>
+      </div>
+
+      <div className="button-spec-panel button-spec-panel-basic">
+        {section.buttons.map((button) => (
+          <SpecButton key={`${section.key}-${button.variant}`} button={button} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ButtonSystem({ buttonSystem }) {
+  return (
+    <section className="doc-section button-system-section" id="buttons">
+      <div className="section-heading">
+        <span className="section-kicker">BUTTON</span>
+        <h2>{buttonSystem.title}</h2>
+        <p>{buttonSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{buttonSystem.intro}</p>
+      </div>
+
+      <div className="button-spec-canvas">
+        {buttonSystem.sections.map((section) => (
+          <ButtonSection key={section.key} section={section} footnote={section.key === 'block' ? buttonSystem.footnote : ''} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function TableActionIcon({ kind }) {
+  if (kind === 'download') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="table-action-icon-svg">
+        <path d="M12 5.5V13.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        <path d="M8.9 10.8L12 13.9L15.1 10.8" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+        <path d="M5.8 17.5H18.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="table-action-icon-svg">
+      <circle cx="6.5" cy="12" r="1.4" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+      <circle cx="17.5" cy="12" r="1.4" fill="currentColor" />
+    </svg>
+  )
+}
+
+function TableCheckbox({ checked = false, onClick = null }) {
+  return (
+    <button type="button" className={`table-checkbox${checked ? ' is-checked' : ''}`} onClick={onClick} aria-pressed={checked}>
+      {checked ? (
+        <svg viewBox="0 0 16 16" className="table-checkbox-icon" aria-hidden="true">
+          <path d="M3.5 8.2L6.4 11L12.2 5.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
+        </svg>
+      ) : null}
+    </button>
+  )
+}
+
+function FolderCell({ row, showMeta = true }) {
+  return (
+    <div className="table-file-cell">
+      <div className="table-folder-icon" aria-hidden="true">
+        <img src={tableFolderIcon} alt="" className="table-folder-svg" />
+      </div>
+      <div className="table-file-meta">
+        <strong>{row.name}</strong>
+        {showMeta ? <span>{row.meta}</span> : null}
+      </div>
+    </div>
+  )
+}
+
+function TableSortIcon({ direction = '' }) {
+  const icon = direction === 'asc' ? tableSortUpCustomIcon : direction === 'desc' ? tableSortDownCustomIcon : tableSortCustomIcon
+
+  return <img src={icon} alt="" className="table-sort-icon-combined" aria-hidden="true" data-direction={direction} />
+}
+
+function TableFilterIcon({ active = false, open = false }) {
+  const icon = active || open ? filterActiveIcon : tableFilterCustomIcon
+
+  return (
+    <img
+      src={icon}
+      alt=""
+      aria-hidden="true"
+      className={`table-filter-icon${active ? ' is-active' : ''}${open ? ' is-open' : ''}`}
+    />
+  )
+}
+
+function SortFilterSpecCard({ section }) {
+  const [sortState, setSortState] = useState({ key: 'modifiedAt', direction: 'desc' })
+  const [filterValue, setFilterValue] = useState('')
+  const [draftFilter, setDraftFilter] = useState('')
+  const [filterOpen, setFilterOpen] = useState(false)
+
+  const filteredRows = section.rows.filter((row) => {
+    if (!filterValue) {
+      return true
+    }
+
+    return row.size === filterValue
+  })
+
+  const rows = [...filteredRows].sort((left, right) => {
+    if (!sortState.key || !sortState.direction) {
+      return 0
+    }
+
+    const delta = new Date(left.modifiedAt).getTime() - new Date(right.modifiedAt).getTime()
+    return sortState.direction === 'asc' ? delta : -delta
+  })
+
+  function toggleSort() {
+    setSortState((current) => ({
+      key: 'modifiedAt',
+      direction: current.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
+
+  function applyFilter() {
+    setFilterValue(draftFilter)
+    setFilterOpen(false)
+  }
+
+  return (
+    <section className="table-spec-block">
+      <div className="table-sort-spec">
+        <h3>{section.title}</h3>
+        <p className="table-spec-description">{section.description}</p>
+
+        <div className="table-sort-card">
+          <div className="table-sort-demo">
+            <div className="table-sort-head">
+              <button type="button" className="table-sort-col table-sort-trigger" onClick={() => toggleSort('name')}>
+                <span>Name</span>
+                <TableSortIcon direction={sortState.key === 'name' ? sortState.direction : ''} />
+              </button>
+              <button type="button" className="table-sort-col table-sort-trigger" onClick={() => toggleSort('salary')}>
+                <span>Salary</span>
+                <TableSortIcon direction={sortState.key === 'salary' ? sortState.direction : ''} />
+              </button>
+              <div className="table-sort-col table-sort-filter-col">
+                <button type="button" className="table-filter-trigger" onClick={() => setFilterOpen((current) => !current)}>
+                  <TableFilterIcon active={Boolean(filterValue)} open={filterOpen} />
+                </button>
+                <span>Address</span>
+                {filterOpen ? (
+                  <div className="table-filter-panel">
+                    <button type="button" className={`table-filter-option${draftFilter === '' ? ' is-selected' : ''}`} onClick={() => setDraftFilter('')}>
+                      全部
+                    </button>
+                    <button
+                      type="button"
+                      className={`table-filter-option${draftFilter === 'London' ? ' is-selected' : ''}`}
+                      onClick={() => setDraftFilter('London')}
+                    >
+                      London
+                    </button>
+                    <button
+                      type="button"
+                      className={`table-filter-option${draftFilter === 'Paris' ? ' is-selected' : ''}`}
+                      onClick={() => setDraftFilter('Paris')}
+                    >
+                      Paris
+                    </button>
+                    <div className="table-filter-actions">
+                      <button type="button" className="table-filter-action" onClick={() => setDraftFilter(filterValue)}>
+                        重置
+                      </button>
+                      <button type="button" className="table-filter-action is-primary" onClick={applyFilter}>
+                        确定
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <button type="button" className="table-sort-col table-sort-trigger" onClick={() => toggleSort('email')}>
+                <span>Email</span>
+                <TableSortIcon direction={sortState.key === 'email' ? sortState.direction : ''} />
+              </button>
+            </div>
+
+            <div className="table-sort-body">
+              {rows.map((row) => (
+                <div key={row.email} className="table-sort-row">
+                  <div>{row.name}</div>
+                  <div>{row.salary}</div>
+                  <div>{row.address}</div>
+                  <div>{row.email}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="table-sort-pagination">
+              <button type="button" className="table-page-arrow" aria-label="上一页">
+                ‹
+              </button>
+              <button type="button" className="table-page-number is-active" aria-current="page">
+                1
+              </button>
+              <button type="button" className="table-page-arrow" aria-label="下一页">
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TableSpecCard({ section, columns, row }) {
+  const [selected, setSelected] = useState(false)
+  const isSelectable = section.selectable
+
+  return (
+    <section className="table-spec-block">
+      <h3>{section.title}</h3>
+
+      <div className="table-spec-card">
+        <div
+          className="table-spec-grid table-spec-grid-head"
+          style={{
+            gridTemplateColumns: section.selectable ? '64px 1.8fr 1fr 0.8fr 0.8fr' : '1.8fr 1fr 0.8fr 0.8fr',
+          }}
+        >
+          {section.selectable ? (
+            <div className="table-spec-cell table-spec-cell-checkbox">
+              <TableCheckbox checked={selected} onClick={() => setSelected((current) => !current)} />
+            </div>
+          ) : null}
+          {columns.map((column) => (
+            <div key={`${section.key}-${column}`} className="table-spec-cell table-spec-head-cell">
+              {column}
+            </div>
+          ))}
+        </div>
+
+        <div
+          className={`table-spec-grid table-spec-grid-row${isSelectable && selected ? ' is-selected' : ''}`}
+          style={{
+            gridTemplateColumns: section.selectable ? '64px 1.8fr 1fr 0.8fr 0.8fr' : '1.8fr 1fr 0.8fr 0.8fr',
+          }}
+        >
+          {section.selectable ? (
+            <div className="table-spec-cell table-spec-cell-checkbox">
+              <TableCheckbox checked={selected} onClick={() => setSelected((current) => !current)} />
+            </div>
+          ) : null}
+          <div className="table-spec-cell">
+            <FolderCell row={row} />
+          </div>
+          <div className="table-spec-cell table-spec-text">{row.modifiedAt}</div>
+          <div className="table-spec-cell table-spec-text">{row.size}</div>
+          <div className="table-spec-cell table-spec-actions">
+            {section.actionType === 'icon' ? (
+              <>
+                <button type="button" className="table-action-icon-btn" aria-label="下载">
+                  <TableActionIcon kind="download" />
+                </button>
+                <button type="button" className="table-action-icon-btn" aria-label="更多">
+                  <TableActionIcon kind="more" />
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="table-action-text-btn">
+                  编辑
+                </button>
+                <button type="button" className="table-action-text-btn">
+                  删除
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function SortFilterTableSpecCard({ section }) {
+  const [sortDirection, setSortDirection] = useState('')
+  const [filterValue, setFilterValue] = useState('')
+  const [draftFilter, setDraftFilter] = useState('')
+  const [filterOpen, setFilterOpen] = useState(false)
+
+  const rows = [...section.rows]
+    .filter((row) => (filterValue ? row.size === filterValue : true))
+    .sort((left, right) => {
+      if (!sortDirection) {
+        return 0
+      }
+
+      const delta = new Date(left.modifiedAt).getTime() - new Date(right.modifiedAt).getTime()
+      return sortDirection === 'asc' ? delta : -delta
+    })
+
+  function applyFilter() {
+    setFilterValue(draftFilter)
+    setFilterOpen(false)
+  }
+
+  return (
+    <section className="table-spec-block">
+      <div className="table-sort-v2">
+        <h3>{section.title}</h3>
+        <p className="table-spec-description">{section.description}</p>
+
+        <div className="table-spec-card table-sort-v2-card">
+          <div className="table-spec-grid table-spec-grid-head table-sort-v2-grid">
+            <div className="table-spec-cell table-spec-head-cell">文件名</div>
+            <div className="table-spec-cell table-spec-head-cell">
+              <button
+                type="button"
+                className="table-sort-v2-trigger"
+                onClick={() =>
+                  setSortDirection((current) => {
+                    if (!current) {
+                      return 'asc'
+                    }
+
+                    if (current === 'asc') {
+                      return 'desc'
+                    }
+
+                    return ''
+                  })
+                }
+              >
+                <span>修改时间</span>
+                <TableSortIcon direction={sortDirection} />
+              </button>
+            </div>
+            <div className="table-spec-cell table-spec-head-cell table-sort-v2-filter-cell">
+              <button type="button" className="table-sort-v2-trigger table-sort-v2-filter-trigger" onClick={() => setFilterOpen((current) => !current)}>
+                <span>大小</span>
+                <TableFilterIcon active={Boolean(filterValue)} open={filterOpen} />
+              </button>
+
+              {filterOpen ? (
+                <div className="table-filter-panel">
+                  <button type="button" className={`table-filter-option${draftFilter === '' ? ' is-selected' : ''}`} onClick={() => setDraftFilter('')}>
+                    全部
+                  </button>
+                  {section.filterOptions.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={`table-filter-option${draftFilter === option ? ' is-selected' : ''}`}
+                      onClick={() => setDraftFilter(option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                  <div className="table-filter-actions">
+                    <button type="button" className="table-filter-action" onClick={() => setDraftFilter('')}>
+                      重置
+                    </button>
+                    <button type="button" className="table-filter-action is-primary" onClick={applyFilter}>
+                      确定
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div className="table-spec-cell table-spec-head-cell">操作</div>
+          </div>
+
+          {rows.map((row) => (
+            <div key={`${row.name}-${row.modifiedAt}`} className="table-spec-grid table-spec-grid-row table-sort-v2-grid">
+              <div className="table-spec-cell">
+                <FolderCell row={row} showMeta={false} />
+              </div>
+              <div className="table-spec-cell table-spec-text">{row.modifiedAt}</div>
+              <div className="table-spec-cell table-spec-text">{row.size}</div>
+              <div className="table-spec-cell">
+                <div className="table-spec-actions">
+                  <button type="button" className="table-action-text-btn">
+                    编辑
+                  </button>
+                  <button type="button" className="table-action-text-btn">
+                    删除
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TableSystem({ tableSystem }) {
+  return (
+    <section className="doc-section table-system-section" id="tables">
+      <div className="section-heading">
+        <span className="section-kicker">TABLE</span>
+        <h2>{tableSystem.title}</h2>
+        <p>{tableSystem.description}</p>
+      </div>
+
+      <div className="table-spec-canvas">
+        {tableSystem.sections.map((section) => (
+          section.key === 'sort-filter' ? (
+            <SortFilterTableSpecCard key={section.key} section={section} />
+          ) : (
+            <TableSpecCard key={section.key} section={section} columns={tableSystem.columns} row={tableSystem.row} />
+          )
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function InputSystem({ inputSystem }) {
   return (
     <section className="doc-section input-system-section" id="inputs">
@@ -1625,6 +2204,8 @@ function App() {
     spacing,
     cornerSystem,
     shadowSystem,
+    buttonSystem,
+    tableSystem,
     inputSystem,
     dropdownSystem,
     components,
@@ -1674,6 +2255,8 @@ function App() {
           />
           <CornerSystem cornerSystem={cornerSystem} onCopy={handleCopy} />
           <ShadowSystem shadowSystem={shadowSystem} onCopy={handleCopy} />
+          <ButtonSystem buttonSystem={buttonSystem} />
+          <TableSystem tableSystem={tableSystem} />
           <InputSystem inputSystem={inputSystem} />
           <DropdownSystem dropdownSystem={dropdownSystem} />
           <Components components={components} />

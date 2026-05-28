@@ -31,6 +31,8 @@ export const specDocument = {
     { id: 'spacing', label: '间距系统' },
     { id: 'corners', label: '圆角规范' },
     { id: 'surfaces', label: '投影规范' },
+    { id: 'buttons', label: '按钮规范' },
+    { id: 'tables', label: '数据表格规范' },
     { id: 'inputs', label: '输入框规范' },
     { id: 'dropdowns', label: '选择器规范' },
     { id: 'components', label: '组件示例' },
@@ -705,6 +707,160 @@ export const specDocument = {
         kind: 'modal',
       },
     ],
+  },
+  buttonSystem: {
+    title: '按钮规范',
+    description:
+      '本节依据 Figma 节点 `634:8283` 的按钮规范页整理，覆盖基础类型、状态、尺寸、图标按钮和块级按钮，方便设计与前端统一使用规则。',
+    intro: '按钮是一种命令组件，可发起一个即时操作。',
+    footnote:
+      '大按钮高度 44、40；中按钮高度 36；小按钮高度 32。危险动作必须二次确认，提交中应展示 loading 并禁用重复点击。',
+    sections: [
+      {
+        key: 'basic',
+        title: '1. 基础用法',
+        description: '按钮分为主要按钮、次要按钮、虚线按钮、线形按钮和文本按钮五种。',
+        buttons: [
+          { label: '安道教育', variant: 'primary' },
+          { label: '安道教育', variant: 'secondary' },
+          { label: '安道教育', variant: 'dashed' },
+          { label: '安道教育', variant: 'outline' },
+          { label: '安道教育', variant: 'text' },
+        ],
+      },
+      {
+        key: 'states',
+        title: '2. 按钮状态',
+        description: '按钮包含四种状态：默认（Default）、悬浮（Hover）、按下（Active）和禁用（Disabled）。',
+        rows: [
+          {
+            label: '默认状态',
+            buttons: [
+              { label: '主要按钮', variant: 'primary' },
+              { label: '次要按钮', variant: 'secondary' },
+              { label: '虚线按钮', variant: 'dashed' },
+              { label: '线形按钮', variant: 'outline' },
+              { label: '文本按钮', variant: 'text' },
+            ],
+          },
+          {
+            label: '禁用状态',
+            buttons: [
+              { label: '主要按钮', variant: 'primary', state: 'disabled' },
+              { label: '次要按钮', variant: 'secondary', state: 'disabled' },
+              { label: '虚线按钮', variant: 'dashed', state: 'disabled' },
+              { label: '线形按钮', variant: 'outline', state: 'disabled' },
+              { label: '文本按钮', variant: 'text', state: 'disabled' },
+            ],
+          },
+          {
+            label: '悬停状态',
+            buttons: [
+              { label: '主要按钮', variant: 'primary', state: 'hover' },
+              { label: '次要按钮', variant: 'secondary', state: 'hover' },
+              { label: '虚线按钮', variant: 'dashed', state: 'hover' },
+              { label: '线形按钮', variant: 'outline', state: 'hover' },
+              { label: '文本按钮', variant: 'text', state: 'hover' },
+            ],
+          },
+          {
+            label: '按下状态',
+            buttons: [
+              { label: '主要按钮', variant: 'primary', state: 'active' },
+              { label: '次要按钮', variant: 'secondary', state: 'active' },
+              { label: '虚线按钮', variant: 'dashed', state: 'active' },
+              { label: '线形按钮', variant: 'outline', state: 'active' },
+              { label: '文本按钮', variant: 'text', state: 'active' },
+            ],
+          },
+        ],
+      },
+      {
+        key: 'sizes',
+        title: '3. 按钮尺寸',
+        description: '按钮分为大、中、小三种尺寸，以适应不同的场景需求。默认尺寸为中号（36px）。',
+        sizes: [
+          { label: '特大号按钮', size: 'lg', note: 'lg (44px)' },
+          { label: '大按钮', size: 'big', note: 'Big Size (40px)' },
+          { label: '主按钮', size: 'md', note: 'md (36px)' },
+          { label: '小号按钮', size: 'sm', note: 'sm (32px)' },
+        ],
+      },
+      {
+        key: 'icons',
+        title: '4. 图标按钮',
+        description: '当需要在按钮内增加图标时，图标可以直观地传达按钮的操作意图。',
+        buttons: [
+          { label: '搜索', variant: 'primary', icon: 'search' },
+          { label: '下载', variant: 'outline', icon: 'download' },
+          { label: '设置', variant: 'secondary', icon: 'setting' },
+          { label: '新建项目', variant: 'dashed', icon: 'plus' },
+          { variant: 'primary', icon: 'search', iconOnly: true },
+          { variant: 'outline', icon: 'plus', iconOnly: true },
+          { label: '删除', variant: 'text-danger', icon: 'delete' },
+          { variant: 'dark-circle', icon: 'plus', iconOnly: true },
+          { label: '新增', variant: 'dark-pill', icon: 'plus-square' },
+        ],
+      },
+      {
+        key: 'block',
+        title: '5. 块级按钮',
+        description: '使按钮宽度适应其父元素的宽度，常用于弹窗底部的操作区或表单提交。',
+        blocks: [
+          { label: '确认提交', variant: 'primary' },
+          { label: '返回上一步', variant: 'secondary' },
+        ],
+      },
+    ],
+  },
+  tableSystem: {
+    title: '数据表格规范',
+    description:
+      '本节依据 Figma 节点 `674:5513` 的表格规范页整理，输出多选表格、默认表格以及操作列图标/文字两种展示方式，方便设计与前端统一实现。',
+    sections: [
+      {
+        key: 'multi-icon',
+        title: '（带多选表格-操作列 图标展示）',
+        selectable: true,
+        actionType: 'icon',
+      },
+      {
+        key: 'plain-icon',
+        title: '（无多选表格-默认表格）',
+        selectable: false,
+        actionType: 'icon',
+      },
+      {
+        key: 'multi-text',
+        title: '（带多选表格-操作列 文字展示）',
+        selectable: true,
+        actionType: 'text',
+      },
+      {
+        key: 'plain-text',
+        title: '（无多选表格-默认表格-操作列 文字展示）',
+        selectable: false,
+        actionType: 'text',
+      },
+      {
+        key: 'sort-filter',
+        title: '排序和筛选',
+        description: '通过排序图标与筛选图标展示表格在排序、筛选场景下的标准样式与交互规则。',
+        filterOptions: ['34.23MB', '38.22MB', '46.66MB'],
+        rows: [
+          { name: '小明的学习资料', modifiedAt: '2026-04-10 18:00', size: '34.23MB' },
+          { name: '小华的学习资料', modifiedAt: '2026-04-09 18:00', size: '38.22MB' },
+          { name: '小华的学习资料', modifiedAt: '2026-04-08 18:00', size: '46.66MB' },
+        ],
+      },
+    ],
+    columns: ['文件名', '修改时间', '大小', '操作'],
+    row: {
+      name: '小明的学习资料',
+      meta: '5个文件',
+      modifiedAt: '2026-04-10 18:00',
+      size: '34.23MB',
+    },
   },
   inputSystem: {
     title: '输入框规范',
