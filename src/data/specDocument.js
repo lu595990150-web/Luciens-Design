@@ -33,6 +33,7 @@ export const specDocument = {
     { id: 'surfaces', label: '投影规范' },
     { id: 'buttons', label: '按钮规范' },
     { id: 'tables', label: '数据表格规范' },
+    { id: 'tabs', label: '标签栏规范' },
     { id: 'inputs', label: '输入框规范' },
     { id: 'dropdowns', label: '选择器规范' },
     { id: 'components', label: '组件示例' },
@@ -861,6 +862,38 @@ export const specDocument = {
       modifiedAt: '2026-04-10 18:00',
       size: '34.23MB',
     },
+  },
+  tabsSystem: {
+    title: '导航标签规范',
+    description:
+      '本节依据 Figma 节点 `683:5679` 的标签栏规范页整理。导航标签页用于在同级内容中切换，支持默认、禁用、不同尺寸以及筛选标签两类扩展形式。',
+    intro: '导航标签页用于在同级内容中切换，支持线性、卡片、胶囊三种基础样式以及可关闭、垂直布局等扩展形式。',
+    tabs: ['标签一', '标签二', '标签三', '标签四'],
+    disabledIndex: 2,
+    sizeGroups: [
+      { label: 'Small (sm · 32px)', size: 'sm', tabs: ['标签一', '标签二', '标签三', '标签四', '标签五'] },
+      { label: 'Medium (md · 40px)', size: 'md', tabs: ['标签一', '标签二', '标签三', '标签四', '标签五'] },
+      { label: 'Large (lg · 48px)', size: 'lg', tabs: ['标签一', '标签二', '标签三', '标签四', '标签五'] },
+      { label: 'Special 1 (Sc · 72px)', size: 'sc72', tabs: ['标签一', '标签二', '标签三', '标签四', '标签五'] },
+      { label: 'Special 2 (Sc · 80px)', size: 'sc80', tabs: ['标签一', '标签二', '标签三', '标签四', '标签五'] },
+    ],
+    filterGroups: [
+      {
+        label: '单选筛选标签',
+        items: [
+          { key: 'list', icon: 'list', active: true },
+          { key: 'grid', icon: 'grid' },
+        ],
+      },
+      {
+        label: '多选筛选标签',
+        items: [
+          { key: 'list-default', icon: 'list' },
+          { key: 'grid-default', icon: 'grid' },
+          { key: 'list-active', icon: 'list-active', active: true },
+        ],
+      },
+    ],
   },
   inputSystem: {
     title: '输入框规范',

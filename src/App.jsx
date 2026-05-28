@@ -12,13 +12,13 @@ import sortDownDefaultIcon from './assets/sort-down-default.svg'
 import sortUpDefaultIcon from './assets/sort-up-default.svg'
 import sortDownActiveIcon from './assets/sort-down-active.svg'
 import sortUpActiveIcon from './assets/sort-up-active.svg'
-import filterDefaultIcon from './assets/filter-default.svg'
-import filterActiveIcon from './assets/filter-active.svg'
 import tableSortCustomIcon from './assets/table-sort-custom.svg'
 import tableSortDownCustomIcon from './assets/table-sort-down-custom.svg'
 import tableSortUpCustomIcon from './assets/table-sort-up-custom.svg'
-import tableFilterCustomIcon from './assets/table-filter-custom.svg'
 import tableFolderIcon from './assets/table-folder.svg'
+import tabListDefaultIcon from './assets/tab-list-default.svg'
+import tabListActiveIcon from './assets/tab-list-active.svg'
+import tabGridIcon from './assets/tab-grid.svg'
 import { specDocument } from './data/specDocument'
 
 function InputIcon({ kind }) {
@@ -1061,15 +1061,20 @@ function TableSortIcon({ direction = '' }) {
 }
 
 function TableFilterIcon({ active = false, open = false }) {
-  const icon = active || open ? filterActiveIcon : tableFilterCustomIcon
-
   return (
-    <img
-      src={icon}
-      alt=""
+    <svg
+      viewBox="0 0 24 24"
       aria-hidden="true"
       className={`table-filter-icon${active ? ' is-active' : ''}${open ? ' is-open' : ''}`}
-    />
+    >
+      <path
+        d="M5 6.25L10.6 12.8752V17.8493L13.4 19.25V12.8752L19 6.25H5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
   )
 }
 
@@ -1270,6 +1275,7 @@ function SortFilterTableSpecCard({ section }) {
   const [filterValue, setFilterValue] = useState('')
   const [draftFilter, setDraftFilter] = useState('')
   const [filterOpen, setFilterOpen] = useState(false)
+  const filterMenuRef = useRef(null)
 
   const rows = [...section.rows]
     .filter((row) => (filterValue ? row.size === filterValue : true))
@@ -1286,6 +1292,21 @@ function SortFilterTableSpecCard({ section }) {
     setFilterValue(draftFilter)
     setFilterOpen(false)
   }
+
+  useEffect(() => {
+    if (!filterOpen) {
+      return undefined
+    }
+
+    function handlePointerDown(event) {
+      if (!filterMenuRef.current?.contains(event.target)) {
+        setFilterOpen(false)
+      }
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [filterOpen])
 
   return (
     <section className="table-spec-block">
@@ -1318,7 +1339,7 @@ function SortFilterTableSpecCard({ section }) {
                 <TableSortIcon direction={sortDirection} />
               </button>
             </div>
-            <div className="table-spec-cell table-spec-head-cell table-sort-v2-filter-cell">
+            <div className="table-spec-cell table-spec-head-cell table-sort-v2-filter-cell" ref={filterMenuRef}>
               <button type="button" className="table-sort-v2-trigger table-sort-v2-filter-trigger" onClick={() => setFilterOpen((current) => !current)}>
                 <span>大小</span>
                 <TableFilterIcon active={Boolean(filterValue)} open={filterOpen} />
@@ -1395,6 +1416,142 @@ function TableSystem({ tableSystem }) {
             <TableSpecCard key={section.key} section={section} columns={tableSystem.columns} row={tableSystem.row} />
           )
         ))}
+      </div>
+    </section>
+  )
+}
+
+function FilterTagIcon({ kind }) {
+  const icon = kind === 'list-active' ? tabListActiveIcon : kind === 'list' ? tabListDefaultIcon : tabGridIcon
+  return <img src={icon} alt="" aria-hidden="true" className="tabs-filter-icon" />
+}
+
+function TabsLineDemo({ items, disabledIndex = -1 }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  return (
+    <div className="tabs-line-demo" role="tablist" aria-label="标签切换">
+      {items.map((item, index) => {
+        const isDisabled = index === disabledIndex
+        const isActive = activeIndex === index
+
+        return (
+          <button
+            key={`${item}-${index}`}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            disabled={isDisabled}
+            className={`tabs-line-item${isActive ? ' is-active' : ''}${isDisabled ? ' is-disabled' : ''}`}
+            onClick={() => {
+              if (!isDisabled) {
+                setActiveIndex(index)
+              }
+            }}
+          >
+            <span>{item}</span>
+            <i className="tabs-line-indicator" aria-hidden="true" />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function TabsSizeRow({ group }) {
+  return (
+    <div className="tabs-size-row">
+      <h4>{group.label}</h4>
+      <div className={`tabs-size-demo is-${group.size}`}>
+        {group.tabs.map((item, index) => (
+          <button key={`${group.size}-${item}-${index}`} type="button" className={`tabs-size-item${index === 0 ? ' is-active' : ''}`}>
+            <span>{item}</span>
+            <i className="tabs-size-indicator" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function TabsFilterGroup({ group }) {
+  const [activeKey, setActiveKey] = useState(group.items.find((item) => item.active)?.key ?? group.items[0]?.key)
+
+  return (
+    <div className="tabs-filter-group">
+      <h4>{group.label}</h4>
+      <div className="tabs-filter-pills">
+        {group.items.map((item) => {
+          const isActive = activeKey === item.key
+          return (
+            <button
+              key={item.key}
+              type="button"
+              className={`tabs-filter-pill${isActive ? ' is-active' : ''}`}
+              onClick={() => setActiveKey(item.key)}
+              aria-pressed={isActive}
+            >
+              <FilterTagIcon kind={isActive && item.icon === 'list' ? 'list-active' : item.icon} />
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function TabsSystem({ tabsSystem }) {
+  return (
+    <section className="doc-section tabs-system-section" id="tabs">
+      <div className="section-heading">
+        <span className="section-kicker">TABS</span>
+        <h2>{tabsSystem.title}</h2>
+        <p>{tabsSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{tabsSystem.intro}</p>
+      </div>
+
+      <div className="tabs-spec-canvas">
+        <section className="tabs-spec-card">
+          <div className="tabs-spec-block">
+            <h3>Default &amp; Active（默认与激活）</h3>
+            <TabsLineDemo items={tabsSystem.tabs} />
+          </div>
+        </section>
+
+        <section className="tabs-spec-card">
+          <div className="tabs-spec-block">
+            <h3>Disabled（含禁用项）</h3>
+            <TabsLineDemo items={tabsSystem.tabs} disabledIndex={tabsSystem.disabledIndex} />
+          </div>
+        </section>
+
+        <section className="tabs-spec-size-panel">
+          <div className="tabs-spec-size-head">
+            <h3>尺寸规范（Size）</h3>
+            <p>提供小、中、大三种尺寸，分别对应 32px / 40px / 48px 高度。特殊模块中使用 72px / 80px 高度。</p>
+          </div>
+
+          <div className="tabs-spec-card tabs-spec-card-size">
+            {tabsSystem.sizeGroups.map((group) => (
+              <TabsSizeRow key={group.label} group={group} />
+            ))}
+          </div>
+        </section>
+
+        <section className="tabs-spec-filter-panel">
+          <div className="tabs-spec-size-head">
+            <h3>筛选标签</h3>
+          </div>
+
+          <div className="tabs-filter-wrap">
+            {tabsSystem.filterGroups.map((group) => (
+              <TabsFilterGroup key={group.label} group={group} />
+            ))}
+          </div>
+        </section>
       </div>
     </section>
   )
@@ -2206,6 +2363,7 @@ function App() {
     shadowSystem,
     buttonSystem,
     tableSystem,
+    tabsSystem,
     inputSystem,
     dropdownSystem,
     components,
@@ -2257,6 +2415,7 @@ function App() {
           <ShadowSystem shadowSystem={shadowSystem} onCopy={handleCopy} />
           <ButtonSystem buttonSystem={buttonSystem} />
           <TableSystem tableSystem={tableSystem} />
+          <TabsSystem tabsSystem={tabsSystem} />
           <InputSystem inputSystem={inputSystem} />
           <DropdownSystem dropdownSystem={dropdownSystem} />
           <Components components={components} />
