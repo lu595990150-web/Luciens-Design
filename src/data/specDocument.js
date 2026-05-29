@@ -36,6 +36,11 @@ export const specDocument = {
     { id: 'tabs', label: '标签栏规范' },
     { id: 'inputs', label: '输入框规范' },
     { id: 'dropdowns', label: '选择器规范' },
+    { id: 'time-picker', label: '时间选择器规范' },
+    { id: 'modals', label: '弹窗规范' },
+    { id: 'switches', label: 'switch规范' },
+    { id: 'cards', label: '卡片规范' },
+    { id: 'empty-states', label: '空状态规范' },
     { id: 'components', label: '组件示例' },
   ],
   principles: [
@@ -1073,6 +1078,207 @@ export const specDocument = {
         },
       ],
     },
+  timePickerSystem: {
+    title: '时间选择器规范',
+    description:
+      '本节基于现有输入框与选择器规范产出时间选择器样式，统一使用 36px 高度、8px 圆角、Gray-9 正文色、Gray-5 占位色，以及 Blue-6 焦点描边和二级下拉投影。',
+    intro: '时间选择器用于录入时分。默认保持空态；鼠标移入触发 Hover，点击展开时间面板，选择后回填到选择器中。',
+    sections: [
+      {
+        key: 'basic',
+        title: '1. 基础用法',
+        description: '通过一个可交互示例承载默认、Hover、聚焦展开和已选中时间的交互状态。',
+        items: [
+          {
+            label: '基础时间选择器',
+            type: 'interactive-time',
+            placeholder: '请选择时间',
+            helper: '默认沿用选择器 194px 宽度、8px 圆角和 Gray-9 文本色；展开面板使用 shadow2-down 投影。',
+            options: ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'],
+          },
+          {
+            label: '开始时间 - 结束时间',
+            type: 'interactive-time-range',
+            startPlaceholder: '开始时间',
+            endPlaceholder: '结束时间',
+            helper: '范围时间选择器沿用同样的圆角、文本色和 Hover / Focus 规则，开始与结束时间分别独立选择。',
+          },
+        ],
+      },
+    ],
+  },
+  modalSystem: {
+    title: '弹窗规范',
+    description:
+      '本节依据 Figma 节点 `785:2644` 的弹窗规范页整理，覆盖说明型弹窗、确认型弹窗、危险操作弹窗和表单录入弹窗，并复用当前站点已定义的按钮、输入框、圆角和投影规范。',
+    intro: '弹窗属于最高层级浮层，默认使用 16px 圆角、深色遮罩背景和 shadow-modal 投影。正文说明使用 Gray-9，次级信息使用 Gray-7，底部操作区延续按钮规范中的 36px 中按钮。',
+    items: [
+      {
+        key: 'info-ack',
+        type: 'info',
+        title: '信息提示弹窗',
+        body: '用于纯说明、非风险动作。标题写动作目的，正文包含对象与下一步。',
+        actions: [{ label: '我知道了', variant: 'primary', width: 98 }],
+      },
+      {
+        key: 'info-confirm',
+        type: 'info-confirm',
+        title: '信息提示弹窗',
+        body: '课程已发布到 2 个班级，学生可在学习任务中查看。你可以继续查看发布详情。',
+        actions: [
+          { label: '取消', variant: 'outline-muted', width: 88 },
+          { label: '确定', variant: 'primary', width: 88 },
+        ],
+      },
+      {
+        key: 'danger-confirm',
+        type: 'danger-confirm',
+        title: '删除提示',
+        body: '课程已发布到 2 个班级，学生可在学习任务中查看。你可以继续查看发布详情。',
+        actions: [
+          { label: '取消', variant: 'outline-muted', width: 88 },
+          { label: '删除课程', variant: 'danger', width: 94 },
+        ],
+      },
+      {
+        key: 'form-basic',
+        type: 'form',
+        title: '创建分类',
+        divider: true,
+        fields: [
+          { label: '安道教育', required: true, placeholder: 'Please Enter' },
+          { label: '安道教育', required: true, placeholder: 'Please Enter' },
+        ],
+        actions: [
+          { label: '取消', variant: 'outline-muted', width: 88 },
+          { label: '确定', variant: 'primary', width: 88 },
+        ],
+      },
+      {
+        key: 'danger-warning',
+        type: 'danger-warning',
+        title: '删除提示',
+        body: '课程已发布到 2 个班级，学生可在学习任务中查看。你可以继续查看发布详情。',
+        warning: '高风险操作需展示影响范围，并在提交中禁用关闭。',
+        actions: [
+          { label: '取消', variant: 'outline-muted', width: 88 },
+          { label: '确认下线课程', variant: 'danger', width: 120 },
+        ],
+      },
+      {
+        key: 'form-plain',
+        type: 'form',
+        title: '创建分类',
+        divider: false,
+        fields: [
+          { label: '安道教育', required: true, placeholder: 'Please Enter' },
+          { label: '安道教育', required: true, placeholder: 'Please Enter' },
+        ],
+        actions: [
+          { label: '取消', variant: 'outline-muted', width: 88 },
+          { label: '确定', variant: 'primary', width: 88 },
+        ],
+      },
+    ],
+  },
+  switchSystem: {
+    title: 'switch规范',
+    description:
+      '本节依据 Figma 节点 `785:2791` 的 switch 规范页整理，并复用当前站点的颜色、圆角与交互规范。开关用于即时生效配置，默认使用 44×24 的轨道尺寸与 16px 旋钮。',
+    intro: '开关适用于即时生效配置；若会影响学生端或数据范围，需要确认弹窗。',
+    sections: [
+      {
+        key: 'radio',
+        title: 'Radio',
+        description: '单选框用于在同级选项中进行互斥选择，默认展示基础形态，并通过点击切换选中项。',
+        items: [
+          { label: '按学校分布', kind: 'default' },
+          { label: '按班级分布', kind: 'checked' },
+        ],
+      },
+      {
+        key: 'checkbox',
+        title: 'Checkbox',
+        description: '多选框用于非互斥选择，默认展示基础形态，并通过点击循环切换默认、选中和半选三种状态。',
+        items: [
+          { label: '同步通知学生', kind: 'default' },
+          { label: '允许补交', kind: 'checked' },
+          { label: '半选状态', kind: 'indeterminate' },
+        ],
+      },
+        {
+          key: 'basic',
+          title: 'Switch',
+          description: '展示关闭与开启的标准开关样式。',
+          items: [
+            { label: '关闭状态', defaultChecked: false },
+            { label: '开启状态', defaultChecked: true },
+          ],
+        },
+      ],
+    },
+  cardSystem: {
+    title: '卡片规范',
+    description:
+      '本节依据 Figma 节点 `787:2840` 的卡片规范页整理，覆盖极简卡片、描边卡片、Header 卡片、Footer 卡片和主色描边卡片，并复用当前站点已定义的圆角、投影、中性色和主色规范。',
+    intro: '卡片用于承载相对独立的信息块，默认使用 16px 圆角和 shadow-card 投影。按内容结构可分为仅内容、带标题栏、带底部栏和强调描边几种形式。',
+    items: [
+      {
+        key: 'plain',
+        type: 'plain',
+        title: '极简卡片-仅有内容的卡片形式',
+        body: '仅有内容区域的卡片形式。卡片内容区域可以是文字、图片、表单、表格等形式信息内容。可使用大中小不同的卡片尺寸，按业务需求进行呈现。',
+      },
+      {
+        key: 'bordered',
+        type: 'bordered',
+        title: '极简卡片-仅有内容的卡片形式-带边框',
+        body: '仅有内容区域的卡片形式。卡片内容区域可以是文字、图片、表单、表格等形式信息内容。可使用大中小不同的卡片尺寸，按业务需求进行呈现。',
+      },
+      {
+        key: 'header',
+        type: 'header',
+        title: '带 header 的卡片',
+        headerTitle: '标题',
+        actionText: '操作',
+        body: '仅有内容区域的卡片形式。卡片内容区域可以是文字、图片、表单、表格等形式信息内容。可使用大中小不同的卡片尺寸，按业务需求进行呈现。',
+      },
+      {
+        key: 'footer',
+        type: 'footer',
+        title: '带 footer 的卡片',
+        footerTitle: '标题',
+        footerMeta: ['次级文本', '数据分类'],
+        footerNote: '由极简卡片下方的底部栏组成，可包含标题、图片、状态等内容。',
+      },
+      {
+        key: 'primary-bordered',
+        type: 'primary-bordered',
+        title: '极简卡片-仅有内容的卡片形式-带主色边框',
+        body: '仅有内容区域的卡片形式。卡片内容区域可以是文字、图片、表单、表格等形式信息内容。可使用大中小不同的卡片尺寸，按业务需求进行呈现。',
+      },
+    ],
+  },
+  emptyStateSystem: {
+    title: '空状态规范',
+    description:
+      '本节依据 Figma 节点 `787:2912` 的空状态规范页整理，覆盖基础空状态与带操作空状态，并复用当前站点的按钮、文字色与留白规范。',
+    intro: '空状态用于反馈当前列表、页面或容器暂无可展示内容。默认以 120px 插画图形、Gray-7 文案和可选主按钮组合呈现。',
+    items: [
+      {
+        key: 'basic',
+        title: '基础的空状态',
+        text: '暂无数据',
+        action: null,
+      },
+      {
+        key: 'actionable',
+        title: '带操作的空状态',
+        text: '暂无数据',
+        action: '返回首页',
+      },
+    ],
+  },
   components: [
     {
       kind: 'button',

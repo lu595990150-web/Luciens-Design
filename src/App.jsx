@@ -19,7 +19,10 @@ import tableFolderIcon from './assets/table-folder.svg'
 import tabListDefaultIcon from './assets/tab-list-default.svg'
 import tabListActiveIcon from './assets/tab-list-active.svg'
 import tabGridIcon from './assets/tab-grid.svg'
+import emptyStateIllustration from './assets/empty-state-illustration.svg'
 import { specDocument } from './data/specDocument'
+
+const cardFooterImage = 'https://www.figma.com/api/mcp/asset/3b920eb4-16df-4e65-87c0-0483a0c3f935'
 
 function InputIcon({ kind }) {
   if (kind === 'search') {
@@ -97,23 +100,6 @@ function LeftSidebar({ overview }) {
       <div className="sidebar-group">
         <span className="sidebar-caption">开发指南</span>
         <nav className="sidebar-links" aria-label="Document navigation">
-          {overview.map((item) => (
-            <a key={item.id} href={`#${item.id}`}>
-              {item.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-    </aside>
-  )
-}
-
-function RightSidebar({ overview }) {
-  return (
-    <aside className="right-sidebar">
-      <div className="outline-card">
-        <span className="sidebar-caption">本页目录</span>
-        <nav className="outline-links" aria-label="Page outline">
           {overview.map((item) => (
             <a key={item.id} href={`#${item.id}`}>
               {item.label}
@@ -885,6 +871,346 @@ function SpecButton({ button, size = 'md', block = false }) {
   )
 }
 
+function ModalCloseIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" className="modal-close-icon-svg">
+      <path d="M6 6L14 14M14 6L6 14" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+function ModalField({ field }) {
+  return (
+    <div className="modal-form-row">
+      <div className="modal-form-label">
+        {field.required ? <span className="input-required">*</span> : null}
+        <span>{field.label}</span>
+      </div>
+      <div className="input-spec-control input-spec-control-real input-spec-control-interactive modal-form-control">
+        <input placeholder={field.placeholder} />
+      </div>
+    </div>
+  )
+}
+
+function ModalActionButton({ action }) {
+  const className = ['button-spec-button', `is-${action.variant}`, 'is-size-md'].join(' ')
+
+  return (
+    <button type="button" className={className} style={{ width: action.width ? `${action.width}px` : undefined }}>
+      <span>{action.label}</span>
+    </button>
+  )
+}
+
+function ModalCard({ item }) {
+  return (
+    <article className="modal-spec-item">
+      <div className="modal-spec-stage">
+        <div className={`modal-spec-dialog${item.type === 'form' ? ' is-form' : ''}${item.warning ? ' is-warning' : ''}`}>
+          <div className="modal-spec-header">
+            <h3>{item.title}</h3>
+            <button type="button" className="modal-close-btn" aria-label="关闭弹窗">
+              <ModalCloseIcon />
+            </button>
+          </div>
+
+          {item.fields ? (
+            <div className="modal-form-body">
+              {item.fields.map((field, index) => (
+                <ModalField key={`${item.key}-${field.label}-${index}`} field={field} />
+              ))}
+            </div>
+          ) : (
+            <div className="modal-spec-body">
+              <p>{item.body}</p>
+            </div>
+          )}
+
+          {item.warning ? <div className="modal-warning-box">{item.warning}</div> : null}
+
+          <div className={`modal-spec-actions${item.actions.length === 1 ? ' is-single' : ''}`}>
+            {item.actions.map((action) => (
+              <ModalActionButton key={`${item.key}-${action.label}`} action={action} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function ModalSystem({ modalSystem }) {
+  return (
+    <section className="doc-section modal-system-section" id="modals">
+      <div className="section-heading">
+        <span className="section-kicker">MODAL</span>
+        <h2>{modalSystem.title}</h2>
+        <p>{modalSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{modalSystem.intro}</p>
+      </div>
+
+      <div className="modal-spec-canvas">
+        {modalSystem.items.map((item) => (
+          <ModalCard key={item.key} item={item} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function SwitchControl({ defaultChecked = false }) {
+  const [checked, setChecked] = useState(defaultChecked)
+
+  return (
+    <button
+      type="button"
+      className={`switch-spec-control${checked ? ' is-checked' : ''}`}
+      onClick={() => setChecked((current) => !current)}
+      role="switch"
+      aria-checked={checked}
+    >
+      <span className="switch-spec-thumb" />
+    </button>
+  )
+}
+
+function RadioControl({ checked = false }) {
+  return (
+    <span className={`choice-spec-radio${checked ? ' is-checked' : ''}`} aria-hidden="true">
+      <span className="choice-spec-radio-dot" />
+    </span>
+  )
+}
+
+function CheckboxControl({ kind = 'default' }) {
+  return (
+    <span className={`choice-spec-checkbox is-${kind}`} aria-hidden="true">
+        {kind === 'checked' ? (
+          <svg viewBox="0 0 16 16" className="choice-spec-checkbox-icon" aria-hidden="true">
+            <path d="M3.6 8L6.7 11L12.3 5.2" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+          </svg>
+        ) : null}
+      {kind === 'indeterminate' ? <span className="choice-spec-checkbox-bar" /> : null}
+    </span>
+  )
+}
+
+function ChoiceSection({ section }) {
+  const isRadio = section.key === 'radio'
+  const [activeRadio, setActiveRadio] = useState(section.items.find((item) => item.kind === 'checked')?.label ?? section.items[0]?.label)
+  const [checkboxStates, setCheckboxStates] = useState(() =>
+    Object.fromEntries(section.items.map((item) => [item.label, item.kind]))
+  )
+
+  function toggleCheckbox(label) {
+    setCheckboxStates((current) => {
+      const next = current[label] === 'default' ? 'checked' : current[label] === 'checked' ? 'indeterminate' : 'default'
+      return { ...current, [label]: next }
+    })
+  }
+
+  return (
+    <section className="switch-spec-block">
+      <div className="button-spec-head">
+        <h3>{section.title}</h3>
+        <p>{section.description}</p>
+      </div>
+
+      <div className="switch-spec-panel switch-spec-panel-choices">
+        <div className={`choice-spec-labeled-list${isRadio ? ' is-radio' : ''}`}>
+          {section.items.map((item) =>
+            isRadio ? (
+              <button
+                key={`${section.key}-${item.label}`}
+                type="button"
+                className="choice-spec-labeled-item"
+                onClick={() => setActiveRadio(item.label)}
+                aria-pressed={activeRadio === item.label}
+              >
+                <RadioControl checked={activeRadio === item.label} />
+                <span>{item.label}</span>
+              </button>
+            ) : (
+              <button
+                key={`${section.key}-${item.label}`}
+                type="button"
+                className="choice-spec-labeled-item"
+                onClick={() => toggleCheckbox(item.label)}
+                aria-pressed={checkboxStates[item.label] !== 'default'}
+              >
+                <CheckboxControl kind={checkboxStates[item.label]} />
+                <span>{item.label}</span>
+              </button>
+            )
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function SwitchSection({ section }) {
+  return (
+    <section className="switch-spec-block">
+      <div className="button-spec-head">
+        <h3>{section.title}</h3>
+        <p>{section.description}</p>
+      </div>
+
+      <div className={`switch-spec-panel${section.key === 'labeled' ? ' is-labeled' : ''}`}>
+        {section.items.map((item) => (
+          <div key={item.label} className="switch-spec-item">
+            <div className="switch-spec-row">
+              <SwitchControl defaultChecked={item.defaultChecked} />
+              <span>{item.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function SwitchSystem({ switchSystem }) {
+  return (
+    <section className="doc-section switch-system-section" id="switches">
+      <div className="section-heading">
+        <span className="section-kicker">SWITCH</span>
+        <h2>{switchSystem.title}</h2>
+        <p>{switchSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{switchSystem.intro}</p>
+      </div>
+
+      <div className="switch-spec-canvas">
+        {switchSystem.sections.map((section) => (
+          section.key === 'radio' || section.key === 'checkbox' ? (
+            <ChoiceSection key={section.key} section={section} />
+          ) : (
+            <SwitchSection key={section.key} section={section} />
+          )
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function CardSpecItem({ item }) {
+  if (item.type === 'footer') {
+    return (
+      <article className="card-spec-item card-spec-item-footer">
+        <div className="card-spec-surface card-spec-surface-footer">
+          <div className="card-spec-footer-head">
+            <h4>{item.footerTitle}</h4>
+            {item.footerMeta.map((meta) => (
+              <p key={meta}>{meta}</p>
+            ))}
+          </div>
+          <img src={cardFooterImage} alt="" aria-hidden="true" className="card-spec-footer-image" />
+        </div>
+        <strong>{item.title}</strong>
+        <span>{item.footerNote}</span>
+      </article>
+    )
+  }
+
+  const surfaceClassName = [
+    'card-spec-surface',
+    item.type === 'bordered' ? 'is-bordered' : '',
+    item.type === 'primary-bordered' ? 'is-primary-bordered' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return (
+    <article className={`card-spec-item${item.type === 'primary-bordered' ? ' card-spec-item-primary' : ''}`}>
+      <div className={surfaceClassName}>
+        {item.type === 'header' ? (
+          <div className="card-spec-header">
+            <h4>{item.headerTitle}</h4>
+            <button type="button" className="card-spec-link">
+              {item.actionText}
+            </button>
+          </div>
+        ) : null}
+        <p>{item.body}</p>
+      </div>
+      <strong>{item.title}</strong>
+    </article>
+  )
+}
+
+function CardSystem({ cardSystem }) {
+  return (
+    <section className="doc-section card-system-section" id="cards">
+      <div className="section-heading">
+        <span className="section-kicker">CARD</span>
+        <h2>{cardSystem.title}</h2>
+        <p>{cardSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{cardSystem.intro}</p>
+      </div>
+
+      <div className="card-spec-canvas">
+        <div className="card-spec-grid">
+          {cardSystem.items.map((item) => (
+            <CardSpecItem key={item.key} item={item} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function EmptyStateItem({ item }) {
+  return (
+    <article className="empty-state-item">
+      <div className="empty-state-surface">
+        <div className="empty-state-content">
+          <img src={emptyStateIllustration} alt="" aria-hidden="true" className="empty-state-illustration" />
+          <p>{item.text}</p>
+          {item.action ? (
+            <button type="button" className="empty-state-action">
+              {item.action}
+            </button>
+          ) : null}
+        </div>
+      </div>
+      <strong>{item.title}</strong>
+    </article>
+  )
+}
+
+function EmptyStateSystem({ emptyStateSystem }) {
+  return (
+    <section className="doc-section empty-state-system-section" id="empty-states">
+      <div className="section-heading">
+        <span className="section-kicker">EMPTY</span>
+        <h2>{emptyStateSystem.title}</h2>
+        <p>{emptyStateSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{emptyStateSystem.intro}</p>
+      </div>
+
+      <div className="empty-state-canvas">
+        {emptyStateSystem.items.map((item) => (
+          <EmptyStateItem key={item.key} item={item} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function ButtonSection({ section, footnote }) {
   if (section.key === 'states') {
     return (
@@ -1613,6 +1939,15 @@ function DropdownSearchIcon() {
   )
 }
 
+function TimePickerClockIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" className="input-icon-svg">
+      <circle cx="8" cy="8" r="5.8" fill="none" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M8 4.7V8l2.1 1.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" />
+    </svg>
+  )
+}
+
 function Combobox({
   items,
   children,
@@ -2198,6 +2533,405 @@ function DropdownSystem({ dropdownSystem }) {
   )
 }
 
+function TimePickerDemo({ item }) {
+  const wrapperRef = useRef(null)
+  const hourColumnRef = useRef(null)
+  const minuteColumnRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedValue, setSelectedValue] = useState('')
+  const hours = Array.from({ length: 24 }, (_, index) => String(index).padStart(2, '0'))
+  const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0'))
+  const initialHour = selectedValue ? selectedValue.split(':')[0] : '08'
+  const initialMinute = selectedValue ? selectedValue.split(':')[1] : '30'
+  const [draftHour, setDraftHour] = useState(initialHour)
+  const [draftMinute, setDraftMinute] = useState(initialMinute)
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    if (selectedValue) {
+      const [hour, minute] = selectedValue.split(':')
+      setDraftHour(hour)
+      setDraftMinute(minute)
+      return
+    }
+
+    setDraftHour('08')
+    setDraftMinute('30')
+  }, [isOpen, selectedValue])
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    const activeHour = hourColumnRef.current?.querySelector(`[data-time-value="${draftHour}"]`)
+    const activeMinute = minuteColumnRef.current?.querySelector(`[data-time-value="${draftMinute}"]`)
+
+    activeHour?.scrollIntoView({ block: 'center' })
+    activeMinute?.scrollIntoView({ block: 'center' })
+  }, [draftHour, draftMinute, isOpen])
+
+  return (
+    <article className="time-picker-spec-item">
+      <div ref={wrapperRef} className="time-picker-combobox">
+        <button
+          type="button"
+          className={`time-picker-trigger${isOpen ? ' is-focus-open' : ''}${selectedValue ? ' has-value' : ''}`}
+          onClick={() => setIsOpen((current) => !current)}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <span className={`time-picker-trigger-value${selectedValue ? ' has-value' : ''}`}>
+            {selectedValue || item.placeholder}
+          </span>
+          <span className="time-picker-trigger-icons" aria-hidden="true">
+            <span className="time-picker-trigger-icon">
+              <TimePickerClockIcon />
+            </span>
+          </span>
+        </button>
+
+        {isOpen ? (
+          <div className="time-picker-panel time-picker-panel-columns" role="dialog" aria-label="时间选择面板">
+            <div className="time-picker-columns">
+              <div ref={hourColumnRef} className="time-picker-column">
+                {hours.map((hour) => (
+                  <button
+                    key={hour}
+                    type="button"
+                    data-time-value={hour}
+                    className={`time-picker-column-option${draftHour === hour ? ' is-active' : ''}`}
+                    onClick={() => setDraftHour(hour)}
+                  >
+                    {hour}
+                  </button>
+                ))}
+              </div>
+
+              <div ref={minuteColumnRef} className="time-picker-column">
+                {minutes.map((minute) => (
+                  <button
+                    key={minute}
+                    type="button"
+                    data-time-value={minute}
+                    className={`time-picker-column-option${draftMinute === minute ? ' is-active' : ''}`}
+                    onClick={() => setDraftMinute(minute)}
+                  >
+                    {minute}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="time-picker-panel-actions">
+              <button
+                type="button"
+                className="time-picker-panel-btn time-picker-panel-btn-secondary"
+                onClick={() => {
+                  const now = new Date()
+                  const currentHour = String(now.getHours()).padStart(2, '0')
+                  const currentMinute = String(now.getMinutes()).padStart(2, '0')
+                  setDraftHour(currentHour)
+                  setDraftMinute(currentMinute)
+                  setSelectedValue(`${currentHour}:${currentMinute}`)
+                }}
+              >
+                此刻
+              </button>
+              <button
+                type="button"
+                className="time-picker-panel-btn time-picker-panel-btn-primary"
+                onClick={() => {
+                  setSelectedValue(`${draftHour}:${draftMinute}`)
+                  setIsOpen(false)
+                }}
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <span className="dropdown-spec-caption">{item.label}</span>
+      {item.helper ? <p className="dropdown-spec-helper">{item.helper}</p> : null}
+    </article>
+  )
+}
+
+function TimeRangePickerDemo({ item }) {
+  const wrapperRef = useRef(null)
+  const startHourRef = useRef(null)
+  const startMinuteRef = useRef(null)
+  const endHourRef = useRef(null)
+  const endMinuteRef = useRef(null)
+  const [activeField, setActiveField] = useState('')
+  const [startValue, setStartValue] = useState('')
+  const [endValue, setEndValue] = useState('')
+  const [rangeError, setRangeError] = useState('')
+  const [draftHour, setDraftHour] = useState('08')
+  const [draftMinute, setDraftMinute] = useState('30')
+  const hours = Array.from({ length: 24 }, (_, index) => String(index).padStart(2, '0'))
+  const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0'))
+  const isOpen = Boolean(activeField)
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setActiveField('')
+      }
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    return () => window.removeEventListener('pointerdown', handlePointerDown)
+  }, [])
+
+  useEffect(() => {
+    if (!rangeError) {
+      return undefined
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setRangeError('')
+    }, 1800)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [rangeError])
+
+  useEffect(() => {
+    if (!activeField) {
+      return
+    }
+
+    const sourceValue = activeField === 'start' ? startValue : endValue
+    if (sourceValue) {
+      const [hour, minute] = sourceValue.split(':')
+      setDraftHour(hour)
+      setDraftMinute(minute)
+    } else {
+      setDraftHour('08')
+      setDraftMinute('30')
+    }
+  }, [activeField, startValue, endValue])
+
+  useEffect(() => {
+    if (!activeField) {
+      return
+    }
+
+    const hourRef = activeField === 'start' ? startHourRef : endHourRef
+    const minuteRef = activeField === 'start' ? startMinuteRef : endMinuteRef
+    const activeHour = hourRef.current?.querySelector(`[data-time-value="${draftHour}"]`)
+    const activeMinute = minuteRef.current?.querySelector(`[data-time-value="${draftMinute}"]`)
+
+    activeHour?.scrollIntoView({ block: 'center' })
+    activeMinute?.scrollIntoView({ block: 'center' })
+  }, [draftHour, draftMinute, activeField])
+
+  function applyCurrentTime() {
+    const now = new Date()
+    const currentHour = String(now.getHours()).padStart(2, '0')
+    const currentMinute = String(now.getMinutes()).padStart(2, '0')
+    const currentValue = `${currentHour}:${currentMinute}`
+    setDraftHour(currentHour)
+    setDraftMinute(currentMinute)
+
+    if (activeField === 'start') {
+      setStartValue(currentValue)
+    }
+
+    if (activeField === 'end') {
+      setEndValue(currentValue)
+    }
+  }
+
+  function confirmDraft() {
+    const currentValue = `${draftHour}:${draftMinute}`
+    const currentMinutes = Number(draftHour) * 60 + Number(draftMinute)
+    const startMinutes = startValue ? Number(startValue.split(':')[0]) * 60 + Number(startValue.split(':')[1]) : null
+    const endMinutes = endValue ? Number(endValue.split(':')[0]) * 60 + Number(endValue.split(':')[1]) : null
+
+    if (activeField === 'end' && startMinutes !== null && currentMinutes <= startMinutes) {
+      setRangeError('结束时间必须晚于开始时间')
+      return
+    }
+
+    if (activeField === 'start' && endMinutes !== null && currentMinutes >= endMinutes) {
+      setRangeError('结束时间必须晚于开始时间')
+      return
+    }
+
+    if (activeField === 'start') {
+      setStartValue(currentValue)
+    }
+
+    if (activeField === 'end') {
+      setEndValue(currentValue)
+    }
+
+    setActiveField('')
+    setRangeError('')
+  }
+
+  function renderRangePanel() {
+    return (
+      <div className="time-picker-panel time-picker-panel-columns time-picker-range-panel" role="dialog" aria-label="时间范围选择面板">
+        <div className="time-picker-columns">
+          <div ref={activeField === 'start' ? startHourRef : endHourRef} className="time-picker-column">
+            {hours.map((hour) => (
+              <button
+                key={hour}
+                type="button"
+                data-time-value={hour}
+                className={`time-picker-column-option${draftHour === hour ? ' is-active' : ''}`}
+                onClick={() => setDraftHour(hour)}
+              >
+                {hour}
+              </button>
+            ))}
+          </div>
+
+          <div ref={activeField === 'start' ? startMinuteRef : endMinuteRef} className="time-picker-column">
+            {minutes.map((minute) => (
+              <button
+                key={minute}
+                type="button"
+                data-time-value={minute}
+                className={`time-picker-column-option${draftMinute === minute ? ' is-active' : ''}`}
+                onClick={() => setDraftMinute(minute)}
+              >
+                {minute}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="time-picker-panel-actions">
+          <button type="button" className="time-picker-panel-btn time-picker-panel-btn-secondary" onClick={applyCurrentTime}>
+            此刻
+          </button>
+          <button type="button" className="time-picker-panel-btn time-picker-panel-btn-primary" onClick={confirmDraft}>
+            确定
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <article className="time-picker-spec-item">
+      <div ref={wrapperRef} className="time-picker-range">
+        <div className="time-picker-range-fields">
+          <div className="time-picker-range-slot">
+            <button
+              type="button"
+              className={`time-picker-trigger${activeField === 'start' ? ' is-focus-open' : ''}${startValue ? ' has-value' : ''}`}
+              onClick={() => setActiveField((current) => (current === 'start' ? '' : 'start'))}
+              aria-haspopup="dialog"
+              aria-expanded={activeField === 'start'}
+            >
+              <span className={`time-picker-trigger-value${startValue ? ' has-value' : ''}`}>
+                {startValue || item.startPlaceholder}
+              </span>
+              <span className="time-picker-trigger-icons" aria-hidden="true">
+                <span className="time-picker-trigger-icon">
+                  <TimePickerClockIcon />
+                </span>
+              </span>
+            </button>
+
+            {activeField === 'start' ? renderRangePanel() : null}
+          </div>
+
+          <span className="time-picker-range-separator">-</span>
+
+          <div className="time-picker-range-slot">
+            <button
+              type="button"
+              className={`time-picker-trigger${activeField === 'end' ? ' is-focus-open' : ''}${endValue ? ' has-value' : ''}`}
+              onClick={() => setActiveField((current) => (current === 'end' ? '' : 'end'))}
+              aria-haspopup="dialog"
+              aria-expanded={activeField === 'end'}
+            >
+              <span className={`time-picker-trigger-value${endValue ? ' has-value' : ''}`}>
+                {endValue || item.endPlaceholder}
+              </span>
+              <span className="time-picker-trigger-icons" aria-hidden="true">
+                <span className="time-picker-trigger-icon">
+                  <TimePickerClockIcon />
+                </span>
+              </span>
+            </button>
+
+            {activeField === 'end' ? renderRangePanel() : null}
+          </div>
+        </div>
+
+        <div className={`time-picker-range-toast${rangeError ? ' is-visible' : ''}`} role="status" aria-live="polite">
+          <span className="time-picker-range-toast-icon">!</span>
+          <span>{rangeError}</span>
+        </div>
+      </div>
+
+      <span className="dropdown-spec-caption">{item.label}</span>
+      {item.helper ? <p className="dropdown-spec-helper">{item.helper}</p> : null}
+    </article>
+  )
+}
+
+function TimePickerSection({ section }) {
+  return (
+    <section className="dropdown-spec-block">
+      <div className="dropdown-spec-head">
+        <h3>{section.title}</h3>
+        <p>{section.description}</p>
+      </div>
+
+      <div className="dropdown-spec-panel dropdown-spec-panel-single">
+        {section.items.map((item) => (
+          item.type === 'interactive-time-range' ? <TimeRangePickerDemo key={item.label} item={item} /> : <TimePickerDemo key={item.label} item={item} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function TimePickerSystem({ timePickerSystem }) {
+  return (
+    <section className="doc-section dropdown-system-section" id="time-picker">
+      <div className="section-heading">
+        <span className="section-kicker">Time Picker</span>
+        <h2>{timePickerSystem.title}</h2>
+        <p>{timePickerSystem.description}</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>{timePickerSystem.intro}</p>
+      </div>
+
+      <div className="dropdown-spec-canvas">
+        {timePickerSystem.sections.map((section) => (
+          <TimePickerSection key={section.key} section={section} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function ShadowCard({ item, onCopy }) {
   return (
     <article className="shadow-card">
@@ -2366,6 +3100,11 @@ function App() {
     tabsSystem,
     inputSystem,
     dropdownSystem,
+    timePickerSystem,
+    modalSystem,
+    switchSystem,
+    cardSystem,
+    emptyStateSystem,
     components,
   } = specDocument
 
@@ -2418,10 +3157,14 @@ function App() {
           <TabsSystem tabsSystem={tabsSystem} />
           <InputSystem inputSystem={inputSystem} />
           <DropdownSystem dropdownSystem={dropdownSystem} />
+          <TimePickerSystem timePickerSystem={timePickerSystem} />
+          <ModalSystem modalSystem={modalSystem} />
+          <SwitchSystem switchSystem={switchSystem} />
+          <CardSystem cardSystem={cardSystem} />
+          <EmptyStateSystem emptyStateSystem={emptyStateSystem} />
           <Components components={components} />
         </main>
 
-        <RightSidebar overview={overview} />
       </div>
 
       <div className={`copy-toast${copyMessage ? ' is-visible' : ''}`} role="status" aria-live="polite">
