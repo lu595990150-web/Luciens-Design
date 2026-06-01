@@ -20,6 +20,35 @@ import tabListDefaultIcon from './assets/tab-list-default.svg'
 import tabListActiveIcon from './assets/tab-list-active.svg'
 import tabGridIcon from './assets/tab-grid.svg'
 import emptyStateIllustration from './assets/empty-state-illustration.svg'
+import sidebarThemeLightIcon from './assets/sidebar-theme-light.svg'
+import sidebarThemeDarkIcon from './assets/sidebar-theme-dark.svg'
+import sidebarThemeLightDarkmodeIcon from './assets/sidebar-theme-light-darkmode.svg'
+import sidebarThemeDarkDarkmodeIcon from './assets/sidebar-theme-dark-darkmode.svg'
+import sidebarThemeLightActiveIcon from './assets/sidebar-theme-light-active.svg'
+import sidebarUserDefaultIcon from './assets/sidebar-user-default.svg'
+import sidebarUserActiveIcon from './assets/sidebar-user-active.svg'
+import sidebarUserDarkDefaultIcon from './assets/sidebar-user-dark-default.svg'
+import sidebarResourceDefaultIcon from './assets/sidebar-resource-default.svg'
+import sidebarResourceActiveIcon from './assets/sidebar-resource-active.svg'
+import sidebarResourceDarkDefaultIcon from './assets/sidebar-resource-dark-default.svg'
+import sidebarEditDefaultIcon from './assets/sidebar-edit-default.svg'
+import sidebarEditActiveIcon from './assets/sidebar-edit-active.svg'
+import sidebarEditDarkDefaultIcon from './assets/sidebar-edit-dark-default.svg'
+import sidebarBookDefaultIcon from './assets/sidebar-book-default.svg'
+import sidebarBookActiveIcon from './assets/sidebar-book-active.svg'
+import sidebarBookDarkDefaultIcon from './assets/sidebar-book-dark-default.svg'
+import sidebarMessageDefaultIcon from './assets/sidebar-message-default.svg'
+import sidebarMessageActiveIcon from './assets/sidebar-message-active.svg'
+import sidebarMessageDarkDefaultIcon from './assets/sidebar-message-dark-default.svg'
+import sidebarMailDefaultIcon from './assets/sidebar-mail-default.svg'
+import sidebarMailActiveIcon from './assets/sidebar-mail-active.svg'
+import sidebarMailDarkDefaultIcon from './assets/sidebar-mail-dark-default.svg'
+import sidebarFileDefaultIcon from './assets/sidebar-file-default.svg'
+import sidebarFileDarkDefaultIcon from './assets/sidebar-file-dark-default.svg'
+import sidebarToolDefaultIcon from './assets/sidebar-tool-default.svg'
+import sidebarAppshellActiveIcon from './assets/sidebar-appshell-active.svg'
+import sidebarHomeDarkDefaultIcon from './assets/sidebar-home-dark-default.svg'
+import sidebarCollapseArrowIcon from './assets/sidebar-collapse-arrow.svg'
 import { specDocument } from './data/specDocument'
 
 const cardFooterImage = 'https://www.figma.com/api/mcp/asset/3b920eb4-16df-4e65-87c0-0483a0c3f935'
@@ -1883,6 +1912,218 @@ function TabsSystem({ tabsSystem }) {
   )
 }
 
+function SidebarNavIcon({ type, active, dark }) {
+  const defaultIcons = dark
+    ? {
+        user: sidebarUserDarkDefaultIcon,
+        home: sidebarHomeDarkDefaultIcon,
+        resource: sidebarResourceDarkDefaultIcon,
+        edit: sidebarEditDarkDefaultIcon,
+        book: sidebarBookDarkDefaultIcon,
+        message: sidebarMessageDarkDefaultIcon,
+        mail: sidebarMailDarkDefaultIcon,
+        file: sidebarFileDarkDefaultIcon,
+        tool: sidebarHomeDarkDefaultIcon,
+      }
+    : {
+        user: sidebarUserDefaultIcon,
+        home: sidebarToolDefaultIcon,
+        resource: sidebarResourceDefaultIcon,
+        edit: sidebarEditDefaultIcon,
+        book: sidebarBookDefaultIcon,
+        message: sidebarMessageDefaultIcon,
+        mail: sidebarMailDefaultIcon,
+        file: sidebarFileDefaultIcon,
+        tool: sidebarToolDefaultIcon,
+      }
+
+  const activeIcons = {
+    user: sidebarUserActiveIcon,
+    home: sidebarAppshellActiveIcon,
+    resource: sidebarResourceActiveIcon,
+    edit: sidebarEditActiveIcon,
+    book: sidebarBookActiveIcon,
+    message: sidebarMessageActiveIcon,
+    mail: sidebarMailActiveIcon,
+    tool: sidebarAppshellActiveIcon,
+  }
+
+  const iconSrc = active ? activeIcons[type] || defaultIcons[type] : defaultIcons[type]
+
+  if (iconSrc) {
+    return <img src={iconSrc} alt="" aria-hidden="true" className="sidebar-nav-icon-svg" />
+  }
+
+  return null
+}
+
+function SidebarNavSystem() {
+  const [theme, setTheme] = useState('light')
+  const [collapsed, setCollapsed] = useState(true)
+  const [activeItemId, setActiveItemId] = useState('book')
+  const isDark = theme === 'dark'
+
+  const themeOptions = [
+    { key: 'light', label: '浅色', icon: sidebarThemeLightIcon },
+    { key: 'dark', label: '深色', icon: sidebarThemeDarkIcon },
+  ]
+
+  const footerThemeOptions = themeOptions.map((option) => ({
+    ...option,
+    icon:
+      theme === option.key
+        ? option.key === 'light'
+          ? sidebarThemeLightActiveIcon
+          : sidebarThemeDarkDarkmodeIcon
+        : isDark
+          ? option.key === 'light'
+            ? sidebarThemeLightDarkmodeIcon
+            : sidebarThemeDarkDarkmodeIcon
+          : option.icon,
+  }))
+
+  const groups = [
+    {
+      label: '菜单',
+      items: [
+        { id: 'user', name: '管理员', icon: 'user' },
+        { id: 'home', name: '主页', icon: 'home' },
+        { id: 'resource', name: '资源', icon: 'resource' },
+        { id: 'edit', name: '创作', icon: 'edit' },
+        { id: 'book', name: '课程', icon: 'book' },
+        { id: 'message', name: '消息', icon: 'message' },
+        { id: 'mail', name: '邮件', icon: 'mail' },
+        { id: 'file', name: '文件', icon: 'file' },
+      ],
+    },
+    {
+      label: '生态工具',
+      items: [
+        { id: 'xclass', name: 'XClass', icon: 'tool' },
+        { id: 'panosight', name: 'PanoSight', icon: 'tool' },
+        { id: 'iwb', name: 'IWB', icon: 'tool' },
+      ],
+    },
+  ]
+
+  return (
+    <section className="doc-section sidebar-nav-system-section" id="sidebar-nav">
+      <div className="section-heading">
+        <span className="section-kicker">Navigation</span>
+        <h2>左侧导航栏规范</h2>
+        <p>支持浅色与深色、展开与收起两种形态，包含真实的选中态与主题切换交互。</p>
+      </div>
+
+      <div className="input-spec-intro-card">
+        <p>当前示例已接入真实的选中/未选中交互。点击任意菜单项可切换高亮状态，底部按钮可切换浅色与深色模式。</p>
+      </div>
+
+      <div className="sidebar-nav-canvas">
+        <div className="sidebar-nav-toolbar">
+          <div className="sidebar-nav-toolbar-group" role="tablist" aria-label="Theme">
+            {themeOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                className={`sidebar-nav-chip${theme === option.key ? ' is-active' : ''}`}
+                onClick={() => setTheme(option.key)}
+              >
+                <img src={option.icon} alt="" aria-hidden="true" className="sidebar-nav-theme-icon" />
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="sidebar-nav-toolbar-group" role="tablist" aria-label="Density">
+            <button type="button" className={`sidebar-nav-chip${!collapsed ? ' is-active' : ''}`} onClick={() => setCollapsed(false)}>展开</button>
+            <button type="button" className={`sidebar-nav-chip${collapsed ? ' is-active' : ''}`} onClick={() => setCollapsed(true)}>收起</button>
+          </div>
+        </div>
+
+        <div className="sidebar-nav-preview-grid">
+          <div className="sidebar-nav-preview-stage">
+            <aside className={`sidebar-nav-preview${isDark ? ' is-dark' : ''}${collapsed ? ' is-collapsed' : ''}${!isDark && collapsed ? ' is-figma-collapsed-light' : ''}`}>
+              <button
+                type="button"
+                className="sidebar-nav-toggle"
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                onClick={() => setCollapsed((current) => !current)}
+              >
+                <img src={sidebarCollapseArrowIcon} alt="" aria-hidden="true" className="sidebar-nav-toggle-icon" />
+              </button>
+
+              <div className="sidebar-nav-preview-content">
+                {groups.map((group) => (
+                  <div key={group.label} className={`sidebar-nav-preview-group${group.label === '生态工具' ? ' sidebar-nav-preview-group-tools' : ''}`}>
+                    {!collapsed ? <span className="sidebar-nav-group-label">{group.label}</span> : null}
+                    <div className="sidebar-nav-items">
+                      {group.items.map((item) => {
+                        const isActive = activeItemId === item.id
+
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={`sidebar-nav-item${isActive ? ' is-active' : ''}${collapsed ? ' is-collapsed' : ''}`}
+                            title={item.name}
+                            aria-pressed={isActive}
+                            onClick={() => setActiveItemId(item.id)}
+                          >
+                            <span className="sidebar-nav-item-icon">
+                              <SidebarNavIcon type={item.icon} active={isActive} dark={isDark} />
+                            </span>
+                            {!collapsed ? <span className="sidebar-nav-item-text">{item.name}</span> : null}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="sidebar-nav-footer">
+                <div className="sidebar-nav-theme-switch" role="tablist" aria-label="Sidebar theme switch">
+                  {footerThemeOptions.map((option) => (
+                    <button
+                      key={option.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={theme === option.key}
+                      className={`sidebar-nav-theme-pill${theme === option.key ? ' is-active' : ''}`}
+                      onClick={() => setTheme(option.key)}
+                    >
+                      <img src={option.icon} alt="" aria-hidden="true" className="sidebar-nav-theme-icon" />
+                      {!collapsed ? <span>{option.label}</span> : null}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div className="sidebar-nav-spec-grid">
+            <article className="doc-card sidebar-nav-spec-card">
+              <h3>容器规格</h3>
+              <p>展开态 `256 x 1016`，收起态 `81 x 1016`，统一 `16px` 圆角，底部固定主题切换区域。</p>
+            </article>
+            <article className="doc-card sidebar-nav-spec-card">
+              <h3>菜单项</h3>
+              <p>展开态 `232 x 56`，收起态 `56 x 56`，图标 `24px`，图标按钮之间保持 `4px` 节奏。</p>
+            </article>
+            <article className="doc-card sidebar-nav-spec-card">
+              <h3>交互状态</h3>
+              <p>点击任意菜单项会即时切换当前选中态，其余项自动回退到未选中态，预览可直接用于核对图标资源。</p>
+            </article>
+            <article className="doc-card sidebar-nav-spec-card">
+              <h3>主题切换</h3>
+              <p>底部主题切换支持浅色与深色两枚图标，深色模式下已使用专门的亮度和月亮资源。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function InputSystem({ inputSystem }) {
   return (
     <section className="doc-section input-system-section" id="inputs">
@@ -3155,6 +3396,7 @@ function App() {
           <ButtonSystem buttonSystem={buttonSystem} />
           <TableSystem tableSystem={tableSystem} />
           <TabsSystem tabsSystem={tabsSystem} />
+          <SidebarNavSystem />
           <InputSystem inputSystem={inputSystem} />
           <DropdownSystem dropdownSystem={dropdownSystem} />
           <TimePickerSystem timePickerSystem={timePickerSystem} />

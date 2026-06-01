@@ -34,6 +34,7 @@ export const specDocument = {
     { id: 'buttons', label: '按钮规范' },
     { id: 'tables', label: '数据表格规范' },
     { id: 'tabs', label: '标签栏规范' },
+    { id: 'sidebar-nav', label: '左侧导航栏规范' },
     { id: 'inputs', label: '输入框规范' },
     { id: 'dropdowns', label: '选择器规范' },
     { id: 'time-picker', label: '时间选择器规范' },
